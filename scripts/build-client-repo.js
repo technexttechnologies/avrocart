@@ -305,6 +305,8 @@ next-env.d.ts
 
 # Native binary engines
 *.node
+*.tmp*
+*.node*
 
 # Operating System Files
 .DS_Store

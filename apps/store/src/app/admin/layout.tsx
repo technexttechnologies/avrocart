@@ -26,7 +26,6 @@ import {
   X,
   Info,
   Search,
-  Sparkles,
   Store,
   LogOut,
   Loader2,

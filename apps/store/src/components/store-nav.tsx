@@ -6,8 +6,8 @@ import {
   ShoppingBag,
   Heart,
   User,
+  UserPlus,
   LogOut,
-  Sparkles,
   Menu,
   X,
   ChevronDown,
@@ -335,7 +335,7 @@ export function StoreNav({ theme }: { theme?: any }) {
                         onClick={() => setUserDropdownOpen(false)}
                         className="flex items-center gap-2 p-2 hover:bg-blue-50 text-blue-600 rounded-lg font-bold transition"
                       >
-                        <Sparkles className="w-3.5 h-3.5" />
+                        <UserPlus className="w-3.5 h-3.5" />
                         <span>Create Full Account</span>
                       </Link>
                     ) : null}
@@ -371,7 +371,7 @@ export function StoreNav({ theme }: { theme?: any }) {
                       onClick={() => setUserDropdownOpen(false)}
                       className="flex items-center gap-2 p-2 hover:bg-slate-50 text-slate-700 font-semibold rounded-lg transition"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                      <UserPlus className="w-3.5 h-3.5 text-blue-600" />
                       <span>Create New Account</span>
                     </Link>
 

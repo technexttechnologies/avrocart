@@ -9,7 +9,6 @@ import {
   Trash2,
   ArrowRight,
   PackageCheck,
-  Sparkles,
   Check,
   ChevronRight,
   RefreshCw,
@@ -88,7 +87,7 @@ export default function WishlistPage() {
             href="/shop"
             className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm shadow-blue-600/25 active:scale-[0.98]"
           >
-            <Sparkles className="w-4 h-4" />
+            <ShoppingBag className="w-4 h-4" />
             <span>Explore Store Catalog</span>
           </Link>
         </div>

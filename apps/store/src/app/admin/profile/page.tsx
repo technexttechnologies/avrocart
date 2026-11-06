@@ -14,7 +14,6 @@ import {
   AlertTriangle,
   RotateCw,
   Clock,
-  Sparkles,
   Users,
   AtSign,
   Mail,

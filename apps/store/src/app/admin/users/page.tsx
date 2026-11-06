@@ -27,7 +27,6 @@ import {
   UserCheck,
   UserX,
   Clock,
-  Sparkles,
   HelpCircle,
 } from "lucide-react";
 
@@ -765,7 +764,7 @@ export default function StoreAdminUsersPage() {
                     onClick={() => setAddPassword(generateRandomPassword())}
                     className="text-[10px] text-[#2563EB] font-bold hover:underline flex items-center gap-1"
                   >
-                    <Sparkles className="w-3 h-3" />
+                    <Key className="w-3 h-3" />
                     Generate Strong PIN
                   </button>
                 </div>

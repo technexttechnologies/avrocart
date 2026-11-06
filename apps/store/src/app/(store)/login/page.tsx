@@ -5,11 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   User,
+  UserPlus,
   Lock,
   Mail,
   Phone,
   ArrowRight,
-  Sparkles,
   Zap,
   ShieldCheck,
   CheckCircle2,
@@ -309,7 +309,7 @@ export default function CustomerLoginPage() {
                 disabled={loading}
                 className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm shadow-blue-600/25 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50"
               >
-                {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
                 <span>Create Customer Account</span>
               </button>
             </form>

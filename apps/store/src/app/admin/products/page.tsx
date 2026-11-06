@@ -15,7 +15,6 @@ import {
   Upload,
   Link as LinkIcon,
   ShoppingBag,
-  Sparkles,
   Tag,
   AlertTriangle,
   X,

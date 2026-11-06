@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingBag, Check, Heart, Sparkles } from "lucide-react";
+import { ShoppingBag, Check, Heart, PackagePlus } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { useWishlist } from "@/context/wishlist-context";
 import { useState } from "react";
@@ -57,7 +57,7 @@ export function ProductCard({ product }: { product: any }) {
         <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10">
           {product.isComboDeal && (
             <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-600 text-white shadow-xs flex items-center gap-1">
-              <Sparkles className="w-3 h-3" />
+              <PackagePlus className="w-3 h-3" />
               COMBO
             </span>
           )}

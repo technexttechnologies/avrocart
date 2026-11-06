@@ -17,7 +17,6 @@ import {
   Fingerprint,
   Cpu,
   Clock,
-  Sparkles,
   Store,
   Building2,
 } from "lucide-react";

@@ -20,7 +20,6 @@ import {
   Sliders,
   CreditCard,
   Printer,
-  Sparkles,
   Search,
   RefreshCw,
   FolderOpen,

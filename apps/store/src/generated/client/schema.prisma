@@ -62,26 +62,56 @@ model Category {
 }
 
 model Product {
-  id               String           @id @default(cuid())
-  title            String
-  slug             String           @unique
-  shortDescription String?
-  description      String
-  regularPrice     Float
-  salePrice        Float?
-  sku              String           @unique
-  stockQuantity    Int              @default(0)
-  categoryId       String?
-  category         Category?        @relation(fields: [categoryId], references: [id])
-  status           String           @default("PUBLISHED") // DRAFT, PUBLISHED, ARCHIVED
-  featured         Boolean          @default(false)
-  metaTitle        String?
-  metaDescription  String?
-  images           ProductImage[]
-  variants         ProductVariant[]
-  inventoryLogs    InventoryLog[]
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  id                   String           @id @default(cuid())
+  title                String
+  slug                 String           @unique
+  shortDescription     String?
+  description          String
+  regularPrice         Float
+  salePrice            Float?
+  sku                  String           @unique
+  stockQuantity        Int              @default(0)
+  categoryId           String?
+  category             Category?        @relation(fields: [categoryId], references: [id])
+  status               String           @default("PUBLISHED") // DRAFT, PUBLISHED, ARCHIVED
+  featured             Boolean          @default(false)
+  metaTitle            String?
+  metaDescription      String?
+  videoUrl             String? // Direct video upload or YouTube/Vimeo embed
+  videoTitle           String? // Optional video caption
+  relatedProductIds    String? // JSON array string of related product IDs
+  isComboDeal          Boolean          @default(false)
+  comboProductIds      String? // JSON array string of combo bundled product IDs
+  comboDiscountPercent Float?           @default(0) // Discount percentage when bought as a combo
+  comboTitle           String? // Title of combo offer e.g. "Complete Setup Kit"
+  images               ProductImage[]
+  variants             ProductVariant[]
+  inventoryLogs        InventoryLog[]
+  reviews              ProductReview[]
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+}
+
+model MediaAsset {
+  id        String   @id @default(cuid())
+  fileName  String
+  fileUrl   String
+  fileType  String // "image" or "video"
+  mimeType  String?
+  fileSize  Int? // Size in bytes
+  altText   String?
+  createdAt DateTime @default(now())
+}
+
+model ProductReview {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  authorName String
+  rating     Int      @default(5)
+  comment    String
+  isApproved Boolean  @default(true)
+  createdAt  DateTime @default(now())
 }
 
 model ProductImage {

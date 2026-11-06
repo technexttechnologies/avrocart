@@ -188,8 +188,36 @@ exports.Prisma.ProductScalarFieldEnum = {
   featured: 'featured',
   metaTitle: 'metaTitle',
   metaDescription: 'metaDescription',
+  videoUrl: 'videoUrl',
+  videoTitle: 'videoTitle',
+  relatedProductIds: 'relatedProductIds',
+  isComboDeal: 'isComboDeal',
+  comboProductIds: 'comboProductIds',
+  comboDiscountPercent: 'comboDiscountPercent',
+  comboTitle: 'comboTitle',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MediaAssetScalarFieldEnum = {
+  id: 'id',
+  fileName: 'fileName',
+  fileUrl: 'fileUrl',
+  fileType: 'fileType',
+  mimeType: 'mimeType',
+  fileSize: 'fileSize',
+  altText: 'altText',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.ProductReviewScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  authorName: 'authorName',
+  rating: 'rating',
+  comment: 'comment',
+  isApproved: 'isApproved',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.ProductImageScalarFieldEnum = {
@@ -366,6 +394,8 @@ exports.Prisma.ModelName = {
   LicenseCache: 'LicenseCache',
   Category: 'Category',
   Product: 'Product',
+  MediaAsset: 'MediaAsset',
+  ProductReview: 'ProductReview',
   ProductImage: 'ProductImage',
   ProductVariant: 'ProductVariant',
   InventoryLog: 'InventoryLog',

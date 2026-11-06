@@ -30,6 +30,8 @@ import {
   Store,
   LogOut,
   Loader2,
+  PackagePlus,
+  UploadCloud,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -147,6 +149,7 @@ export default function StoreAdminLayout({
     { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { label: "Orders & Shipping", href: "/admin/orders", icon: ShoppingBag },
     { label: "Products & Variants", href: "/admin/products", icon: Layers },
+    { label: "Combo Deals & Bundles", href: "/admin/combos", icon: PackagePlus },
     { label: "Categories", href: "/admin/categories", icon: Archive },
     { label: "Inventory Control", href: "/admin/inventory", icon: BarChart3 },
     { label: "Customers", href: "/admin/customers", icon: Users },
@@ -154,6 +157,7 @@ export default function StoreAdminLayout({
 
   const navGrowth = [
     { label: "Coupons & Discounts", href: "/admin/coupons", icon: Tag },
+    { label: "Media & Asset Library", href: "/admin/media", icon: UploadCloud },
     { label: "Sales Reports", href: "/admin/reports", icon: BarChart3 },
     { label: "Theme Customizer", href: "/admin/themes", icon: Palette },
   ];

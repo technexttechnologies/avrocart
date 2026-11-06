@@ -14,6 +14,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   History,
+  Store,
+  Link2,
 } from "lucide-react";
 
 export default function LicensesControlPage() {
@@ -32,6 +34,48 @@ export default function LicensesControlPage() {
   // Rebind domain modal
   const [rebindTarget, setRebindTarget] = useState<any | null>(null);
   const [rebindDomain, setRebindDomain] = useState("");
+
+  // Connect to Store State
+  const [connectStoreTarget, setConnectStoreTarget] = useState<any | null>(null);
+  const [targetStoreUrl, setTargetStoreUrl] = useState("http://localhost:3001");
+  const [isConnectingStore, setIsConnectingStore] = useState(false);
+  const [connectSuccessMsg, setConnectSuccessMsg] = useState<string | null>(null);
+  const [connectErrorMsg, setConnectErrorMsg] = useState<string | null>(null);
+
+  const handleConnectToStore = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!connectStoreTarget || !targetStoreUrl) return;
+
+    setIsConnectingStore(true);
+    setConnectSuccessMsg(null);
+    setConnectErrorMsg(null);
+
+    try {
+      const res = await fetch("/api/v1/control/licenses/connect-store", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          licenseId: connectStoreTarget.id,
+          licenseKey: connectStoreTarget.licenseKey,
+          storeUrl: targetStoreUrl,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setConnectErrorMsg(data.error || "Failed to connect license to store.");
+      } else {
+        setConnectSuccessMsg(data.message || "License successfully deployed to store!");
+        setTimeout(() => {
+          loadData();
+        }, 1500);
+      }
+    } catch (err: any) {
+      setConnectErrorMsg(`Network error: ${err.message}`);
+    } finally {
+      setIsConnectingStore(false);
+    }
+  };
 
   const loadData = () => {
     setLoading(true);
@@ -216,6 +260,18 @@ export default function LicensesControlPage() {
                           Activate
                         </button>
                       )}
+                      <button
+                        onClick={() => {
+                          setConnectStoreTarget(lic);
+                          setTargetStoreUrl("http://localhost:3001");
+                          setConnectSuccessMsg(null);
+                          setConnectErrorMsg(null);
+                        }}
+                        className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold border border-emerald-200"
+                        title="Connect this license directly to a remote store URL"
+                      >
+                        Connect Store
+                      </button>
                       <button
                         onClick={() => {
                           setRebindTarget(lic);
@@ -404,6 +460,98 @@ export default function LicensesControlPage() {
                     Save Binding
                   </button>
                 </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Connect to Store Modal */}
+      {connectStoreTarget && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-slate-200 max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                  <Store className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">Connect License to Store</h3>
+                  <p className="text-xs text-slate-400">Deploy license key directly to a running AVRO Store.</p>
+                </div>
+              </div>
+              <button onClick={() => setConnectStoreTarget(null)} className="p-1 rounded-lg hover:bg-slate-100 text-slate-400">
+                ✕
+              </button>
+            </div>
+
+            {connectSuccessMsg && (
+              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <span>{connectSuccessMsg}</span>
+              </div>
+            )}
+
+            {connectErrorMsg && (
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                <span>{connectErrorMsg}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleConnectToStore} className="space-y-4 text-xs">
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold text-slate-400">License Key</span>
+                  <span className="px-2 py-0.2 rounded-full text-[10px] font-black bg-blue-50 text-blue-700">
+                    {connectStoreTarget.planTier} Plan
+                  </span>
+                </div>
+                <p className="font-mono font-bold text-slate-900">{connectStoreTarget.licenseKey}</p>
+                <p className="text-[11px] text-slate-500">Customer: {connectStoreTarget.customer?.name} ({connectStoreTarget.customer?.email})</p>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Target Store Base URL
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    required
+                    value={targetStoreUrl}
+                    onChange={(e) => setTargetStoreUrl(e.target.value)}
+                    placeholder="e.g. http://localhost:3001 or https://mystore.com"
+                    className="flex-1 px-3 py-2 rounded-xl border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setTargetStoreUrl("http://localhost:3001")}
+                    className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px]"
+                  >
+                    Local 3001
+                  </button>
+                </div>
+                <span className="text-[10px] text-slate-400 mt-1 block">
+                  Central will POST directly to <code>{targetStoreUrl}/api/admin/license/connect</code>
+                </span>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setConnectStoreTarget(null)}
+                  className="px-4 py-2 rounded-xl border border-slate-300 font-bold text-slate-700 hover:bg-slate-50"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  disabled={isConnectingStore}
+                  className="px-5 py-2 rounded-xl bg-[#0A192F] hover:bg-[#1E293B] text-white font-bold transition flex items-center gap-2 shadow-sm"
+                >
+                  <Link2 className="w-3.5 h-3.5" />
+                  <span>{isConnectingStore ? "Connecting Store..." : "Deploy License to Store"}</span>
+                </button>
               </div>
             </form>
           </div>

@@ -49,3 +49,7 @@ Thumbs.db
 
 # Vercel deployment folder
 .vercel/
+
+# User Uploaded Media
+apps/store/public/uploads/products/*
+!apps/store/public/uploads/products/.gitkeep

@@ -183,7 +183,32 @@ sequenceDiagram
 
 ---
 
-## 6. Self-Hosted Production VPS Deployment
+## 6. Turnkey Customer Storefront Deployment Kit
+
+For fast, zero-headache deployment of the customer storefront on any server, use the dedicated deployment folder:
+
+📂 **[`customer-storefront-deployment/`](file:///customer-storefront-deployment/README.md)**
+
+### Available Deployment Tools:
+- **`deploy.sh`:** 1-Click interactive Linux/macOS deployment wizard.
+- **`deploy.bat`:** 1-Click interactive Windows deployment script.
+- **`docker-compose.yml`:** Production stack with Next.js Storefront, PostgreSQL 16, and Caddy automatic SSL.
+- **`nginx.conf` & `Caddyfile`:** Production reverse proxy configs with caching, HTTP/2, and gzip.
+- **`ecosystem.config.js`:** PM2 process manager config with clustering and auto-restart.
+- **`scripts/init-db.js`:** Connects to DB, runs Prisma push, and seeds initial store admin credentials.
+- **`scripts/test-connection.js`:** Pre-flight diagnostic checker.
+- **`scripts/package-standalone.js`:** Exports a standalone distribution bundle for clients.
+
+```bash
+# Instant launch via Docker Compose:
+cd customer-storefront-deployment
+cp .env.example .env
+docker compose up -d
+```
+
+---
+
+## 7. Self-Hosted Production VPS Deployment
 
 ### Option A: Docker Compose (Recommended)
 1. Provision any standard Ubuntu 22.04 or Debian 12 VPS (e.g. Hetzner, DigitalOcean, AWS EC2).

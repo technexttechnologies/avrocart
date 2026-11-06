@@ -19,7 +19,10 @@
     "db:central:push": "npm --workspace=apps/central run db:push",
     "db:store:generate": "npm --workspace=apps/store run db:generate",
     "db:store:push": "npm --workspace=apps/store run db:push",
-    "db:seed": "npm --workspace=apps/central run db:seed && npm --workspace=apps/store run db:seed"
+    "db:seed": "npm --workspace=apps/central run db:seed && npm --workspace=apps/store run db:seed",
+    "deploy:store": "node customer-storefront-deployment/scripts/init-db.js",
+    "test:store:deploy": "node customer-storefront-deployment/scripts/test-connection.js",
+    "package:store": "node customer-storefront-deployment/scripts/package-standalone.js"
   },
   "devDependencies": {
     "typescript": "^5.4.5"

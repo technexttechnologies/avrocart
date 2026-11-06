@@ -1,0 +1,33 @@
+# ==============================================================================
+# AVRO CUSTOMER STOREFRONT — SYSTEMD SERVICE CONFIGURATION
+# ==============================================================================
+# Installation on Ubuntu / Debian:
+#   1. Edit paths and User below to match your server user and folder.
+#   2. Copy to systemd: sudo cp systemd/avro-store.service /etc/systemd/system/
+#   3. Reload daemon:   sudo systemctl daemon-reload
+#   4. Enable on boot:  sudo systemctl enable avro-store
+#   5. Start service:   sudo systemctl start avro-store
+#   6. Check logs:      sudo journalctl -u avro-store -f
+# ==============================================================================
+
+[Unit]
+Description=AVRO Customer Storefront Service
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/avro
+Environment=NODE_ENV=production
+Environment=PORT=3001
+ExecStart=/usr/bin/npm --workspace=apps/store run start
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=avro-store
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

@@ -13,7 +13,6 @@ import {
   Mail,
   Phone,
   Clock,
-  Lock,
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { AVRO_THEMES } from "@/lib/themes-registry";
@@ -371,25 +370,6 @@ export default function StoreFooter({ theme }: { theme?: any }) {
                 </Link>
               </li>
             </ul>
-
-            {/* Security Assurance Badge */}
-            <div
-              className="mt-4 p-3 rounded-xl border flex items-center gap-2.5 text-[11px]"
-              style={{
-                backgroundColor: isDarkFooter ? "rgba(255,255,255,0.04)" : "#F8FAFC",
-                borderColor: isDarkFooter ? "rgba(255,255,255,0.08)" : "#E2E8F0",
-              }}
-            >
-              <Lock className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-              <div>
-                <span className="font-bold block" style={{ color: isDarkFooter ? "#FFFFFF" : "#0F172A" }}>
-                  256-Bit SSL Encrypted
-                </span>
-                <span className="text-[10px] text-slate-400">
-                  Bank-grade encrypted checkout
-                </span>
-              </div>
-            </div>
           </div>
         </div>
 

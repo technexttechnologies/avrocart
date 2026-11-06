@@ -51,10 +51,40 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Lookup Admin User
-    let admin = await prisma.adminUser.findUnique({
-      where: { email: cleanEmail },
-    });
+    // 2. Lookup Admin User with self-healing table creation
+    let admin: any = null;
+    try {
+      admin = await prisma.adminUser.findUnique({
+        where: { email: cleanEmail },
+      });
+    } catch (dbErr: any) {
+      console.warn("Direct admin lookup exception:", dbErr?.message);
+      if (dbErr?.message && (dbErr.message.includes("does not exist") || dbErr.message.includes("relation"))) {
+        try {
+          console.log("[self-heal] Creating central schema and AdminUser table on-the-fly...");
+          await prisma.$executeRawUnsafe(`
+            CREATE SCHEMA IF NOT EXISTS central;
+            CREATE TABLE IF NOT EXISTS central."AdminUser" (
+              "id" TEXT PRIMARY KEY,
+              "name" TEXT NOT NULL,
+              "email" TEXT UNIQUE NOT NULL,
+              "passwordHash" TEXT NOT NULL,
+              "role" TEXT NOT NULL DEFAULT 'SUPER_ADMIN',
+              "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+          `);
+          admin = await prisma.adminUser.findUnique({
+            where: { email: cleanEmail },
+          });
+        } catch (healErr: any) {
+          console.error("[self-heal] Creation failed:", healErr?.message);
+          throw dbErr;
+        }
+      } else {
+        throw dbErr;
+      }
+    }
 
     // Fallback seed admin check for immediate accessibility
     if (!admin && cleanEmail === "admin@technext.co") {

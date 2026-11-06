@@ -6,32 +6,63 @@ declare global {
 }
 
 export function getCentralDbUrl(): string | undefined {
-  const candidates: (string | undefined)[] = [
-    process.env.DATABASE_URL,
-    process.env.SUPABASE_POSTGRES_PRISMA_URL,
-    process.env.POSTGRES_PRISMA_URL,
-    process.env.SUPABASE_POSTGRES_URL,
-    process.env.POSTGRES_URL,
-    process.env.SUPABASE_POSTGRES_URL_NON_POOLING,
-    process.env.DIRECT_URL,
+  const env = process.env;
+  const envKeys = Object.keys(env);
+
+  // 1. High-priority check for Supabase environment variables (e.g. from Vercel Supabase integration)
+  const supabaseCandidateKeys = [
+    "SUPABASE_POSTGRES_PRISMA_URL",
+    "SUPABASE_POSTGRES_URL",
+    "SUPABASE_DATABASE_URL",
+    "SUPABASE_POSTGRES_URL_NON_POOLING",
   ];
 
-  // Also check any prefixed variables dynamically (e.g. from Vercel integrations)
-  for (const [key, val] of Object.entries(process.env)) {
-    if (
-      val &&
-      (key.endsWith("_POSTGRES_PRISMA_URL") ||
-        key.endsWith("_DATABASE_URL") ||
-        key.endsWith("_POSTGRES_URL"))
-    ) {
-      candidates.push(val);
-    }
+  let bestKey = supabaseCandidateKeys.find(
+    (k) => env[k] && typeof env[k] === "string" && env[k]!.trim().length > 0
+  );
+
+  // 2. Check for any environment variable containing SUPABASE in the name
+  if (!bestKey) {
+    bestKey = envKeys.find(
+      (k) =>
+        k.toUpperCase().includes("SUPABASE") &&
+        (k.includes("PRISMA_URL") || k.includes("DATABASE_URL") || k.includes("POSTGRES_URL")) &&
+        env[k] &&
+        typeof env[k] === "string" &&
+        env[k]!.trim().length > 0
+    );
   }
 
-  let dbUrl = candidates.find((c) => typeof c === "string" && c.trim().length > 0);
+  // 3. Check for any variable whose value targets Supabase hosts
+  if (!bestKey) {
+    bestKey = envKeys.find(
+      (k) =>
+        env[k] &&
+        typeof env[k] === "string" &&
+        (env[k]!.includes("supabase.co") || env[k]!.includes("pooler.supabase.com"))
+    );
+  }
+
+  // 4. Standard DATABASE_URL (ignore old vercel-storage if alternative exists)
+  if (!bestKey && env.DATABASE_URL && !env.DATABASE_URL.includes("vercel-storage.com")) {
+    bestKey = "DATABASE_URL";
+  }
+
+  // 5. Fallback to any remaining URL variables
+  if (!bestKey) {
+    const fallbacks = [
+      "DATABASE_URL",
+      "POSTGRES_PRISMA_URL",
+      "POSTGRES_URL",
+      "DIRECT_URL",
+    ];
+    bestKey = fallbacks.find((k) => env[k] && typeof env[k] === "string" && env[k]!.trim().length > 0);
+  }
+
+  let dbUrl = bestKey ? env[bestKey]?.trim() : undefined;
   if (!dbUrl) return undefined;
 
-  // If connecting to PostgreSQL, enforce schema=central parameter
+  // Enforce schema=central
   if (
     dbUrl.startsWith("postgres://") ||
     dbUrl.startsWith("postgresql://") ||
@@ -50,7 +81,6 @@ export function getCentralDbUrl(): string | undefined {
     }
   }
 
-  // Ensure process.env.DATABASE_URL reflects the schema for Prisma internally
   if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.includes("schema=central")) {
     process.env.DATABASE_URL = dbUrl;
   }

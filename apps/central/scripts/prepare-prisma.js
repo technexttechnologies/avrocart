@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { execSync } = require("child_process");
 
 const schemaPath = path.join(__dirname, "../prisma/schema.prisma");
 const envPath = path.join(__dirname, "../.env");
@@ -10,72 +11,143 @@ if (!fs.existsSync(schemaPath)) {
 }
 
 let schema = fs.readFileSync(schemaPath, "utf8");
-
-// Dynamically discover any Supabase / PostgreSQL connection variable
 const envKeys = Object.keys(process.env);
 
-let urlEnvVar = "DATABASE_URL";
-let dbUrl = process.env.DATABASE_URL || "";
+// 1. Discover primary database URL with SUPABASE prioritizing over old Vercel Postgres
+let urlEnvVar = "";
+let dbUrl = "";
+
+const supabaseKeys = [
+  "SUPABASE_POSTGRES_PRISMA_URL",
+  "SUPABASE_POSTGRES_URL",
+  "SUPABASE_DATABASE_URL",
+  "SUPABASE_POSTGRES_URL_NON_POOLING",
+];
+
+for (const k of supabaseKeys) {
+  if (process.env[k] && typeof process.env[k] === "string" && process.env[k].trim()) {
+    urlEnvVar = k;
+    dbUrl = process.env[k].trim();
+    break;
+  }
+}
 
 if (!dbUrl) {
-  // Check common Vercel / Supabase integration variables or any custom prefix
-  const matchKey = envKeys.find(
-    (k) =>
-      k === "POSTGRES_PRISMA_URL" ||
-      k.endsWith("_POSTGRES_PRISMA_URL") ||
-      k === "POSTGRES_URL" ||
-      k.endsWith("_POSTGRES_URL") ||
-      (k.endsWith("_DATABASE_URL") && k !== "DATABASE_URL")
-  );
-
-  if (matchKey && process.env[matchKey]) {
-    urlEnvVar = matchKey;
-    dbUrl = process.env[matchKey];
-    console.log(`[prepare-prisma] Discovered connection variable: ${urlEnvVar}`);
+  for (const k of envKeys) {
+    if (
+      k.toUpperCase().includes("SUPABASE") &&
+      (k.includes("PRISMA_URL") || k.includes("DATABASE_URL") || k.includes("POSTGRES_URL")) &&
+      process.env[k]
+    ) {
+      urlEnvVar = k;
+      dbUrl = process.env[k].trim();
+      break;
+    }
   }
 }
 
-let directEnvVar = "DIRECT_URL";
-let directUrl = process.env.DIRECT_URL || "";
+if (!dbUrl) {
+  for (const k of envKeys) {
+    const val = process.env[k];
+    if (val && typeof val === "string" && (val.includes("supabase.co") || val.includes("pooler.supabase.com"))) {
+      urlEnvVar = k;
+      dbUrl = val.trim();
+      break;
+    }
+  }
+}
+
+if (!dbUrl && process.env.DATABASE_URL && !process.env.DATABASE_URL.includes("vercel-storage.com")) {
+  urlEnvVar = "DATABASE_URL";
+  dbUrl = process.env.DATABASE_URL.trim();
+}
+
+if (!dbUrl) {
+  const fallbacks = ["DATABASE_URL", "POSTGRES_PRISMA_URL", "POSTGRES_URL", "DIRECT_URL"];
+  for (const k of fallbacks) {
+    if (process.env[k] && typeof process.env[k] === "string" && process.env[k].trim()) {
+      urlEnvVar = k;
+      dbUrl = process.env[k].trim();
+      break;
+    }
+  }
+}
+
+if (!urlEnvVar) urlEnvVar = "DATABASE_URL";
+
+// 2. Discover Direct (Non-Pooling) URL for migrations
+let directEnvVar = "";
+let directUrl = "";
+
+const supabaseDirectKeys = [
+  "SUPABASE_POSTGRES_URL_NON_POOLING",
+  "SUPABASE_DIRECT_URL",
+  "SUPABASE_POSTGRES_URL",
+];
+
+for (const k of supabaseDirectKeys) {
+  if (process.env[k] && typeof process.env[k] === "string" && process.env[k].trim()) {
+    directEnvVar = k;
+    directUrl = process.env[k].trim();
+    break;
+  }
+}
 
 if (!directUrl) {
-  const matchDirect = envKeys.find(
-    (k) =>
-      k === "POSTGRES_URL_NON_POOLING" ||
-      k.endsWith("_POSTGRES_URL_NON_POOLING") ||
-      k.endsWith("_DIRECT_URL")
-  );
-
-  if (matchDirect && process.env[matchDirect]) {
-    directEnvVar = matchDirect;
-    directUrl = process.env[matchDirect];
-    console.log(`[prepare-prisma] Discovered non-pooling direct variable: ${directEnvVar}`);
+  for (const k of envKeys) {
+    if (
+      k.toUpperCase().includes("SUPABASE") &&
+      (k.includes("NON_POOLING") || k.includes("DIRECT")) &&
+      process.env[k]
+    ) {
+      directEnvVar = k;
+      directUrl = process.env[k].trim();
+      break;
+    }
   }
 }
 
-// Detect database provider based on connection string or Vercel environment
+if (!directUrl && process.env.DIRECT_URL && !process.env.DIRECT_URL.includes("vercel-storage.com")) {
+  directEnvVar = "DIRECT_URL";
+  directUrl = process.env.DIRECT_URL.trim();
+}
+
+if (!directUrl) {
+  const fallbacks = ["DIRECT_URL", "POSTGRES_URL_NON_POOLING"];
+  for (const k of fallbacks) {
+    if (process.env[k] && typeof process.env[k] === "string" && process.env[k].trim()) {
+      directEnvVar = k;
+      directUrl = process.env[k].trim();
+      break;
+    }
+  }
+}
+
+if (!directEnvVar) directEnvVar = "DIRECT_URL";
+
+console.log(`[prepare-prisma] Central bound DB URL: ${urlEnvVar} (${dbUrl ? "found" : "empty"})`);
+console.log(`[prepare-prisma] Central bound Direct URL: ${directEnvVar} (${directUrl ? "found" : "empty"})`);
+
+// 3. Configure PostgreSQL in schema.prisma and enforce schema=central
 if (
   dbUrl.startsWith("postgres://") ||
   dbUrl.startsWith("postgresql://") ||
   dbUrl.startsWith("prisma://") ||
   process.env.VERCEL
 ) {
-  console.log(`[prepare-prisma] Detected PostgreSQL (Supabase/Neon). Binding url = env("${urlEnvVar}")`);
+  console.log(`[prepare-prisma] Detected PostgreSQL (Supabase/Postgres). Binding url = env("${urlEnvVar}")`);
   schema = schema.replace(/provider\s*=\s*"sqlite"/g, 'provider = "postgresql"');
 
-  // Enforce schema=central
   if (dbUrl && !dbUrl.includes("schema=")) {
     dbUrl += (dbUrl.includes("?") ? "&" : "?") + "schema=central";
     process.env[urlEnvVar] = dbUrl;
     process.env.DATABASE_URL = dbUrl;
-    console.log("[prepare-prisma] Appended schema=central to Central DB URL");
   }
 
   if (directUrl && !directUrl.includes("schema=")) {
     directUrl += (directUrl.includes("?") ? "&" : "?") + "schema=central";
     process.env[directEnvVar] = directUrl;
     process.env.DIRECT_URL = directUrl;
-    console.log("[prepare-prisma] Appended schema=central to Central DIRECT_URL");
   }
 
   if (urlEnvVar !== "DATABASE_URL") {
@@ -118,3 +190,24 @@ if (
 
 fs.writeFileSync(schemaPath, schema);
 console.log("[prepare-prisma] Central schema.prisma verified successfully.");
+
+// 4. On Vercel build: Automatically sync schema to ensure tables exist in connected DB
+if (process.env.VERCEL && dbUrl && (dbUrl.startsWith("postgres://") || dbUrl.startsWith("postgresql://"))) {
+  try {
+    console.log("[prepare-prisma] Executing build-time schema sync (prisma db push)...");
+    execSync("npx prisma db push --accept-data-loss --skip-generate", {
+      cwd: path.join(__dirname, ".."),
+      stdio: "inherit",
+      env: {
+        ...process.env,
+        DATABASE_URL: directUrl || dbUrl,
+        DIRECT_URL: directUrl || dbUrl,
+        [urlEnvVar]: dbUrl,
+        [directEnvVar]: directUrl || dbUrl,
+      },
+    });
+    console.log("[prepare-prisma] Schema push succeeded.");
+  } catch (syncErr) {
+    console.warn("[prepare-prisma] Non-fatal schema push notice:", syncErr.message);
+  }
+}

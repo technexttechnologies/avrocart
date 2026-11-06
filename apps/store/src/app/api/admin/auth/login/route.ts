@@ -51,10 +51,40 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Lookup Store Admin
-    let admin = await prisma.storeAdmin.findUnique({
-      where: { email: cleanEmail },
-    });
+    // 2. Lookup Store Admin with self-healing table creation
+    let admin: any = null;
+    try {
+      admin = await prisma.storeAdmin.findUnique({
+        where: { email: cleanEmail },
+      });
+    } catch (dbErr: any) {
+      console.warn("Direct store admin lookup exception:", dbErr?.message);
+      if (dbErr?.message && (dbErr.message.includes("does not exist") || dbErr.message.includes("relation"))) {
+        try {
+          console.log("[self-heal] Creating store schema and StoreAdmin table on-the-fly...");
+          await prisma.$executeRawUnsafe(`
+            CREATE SCHEMA IF NOT EXISTS store;
+            CREATE TABLE IF NOT EXISTS store."StoreAdmin" (
+              "id" TEXT PRIMARY KEY,
+              "name" TEXT NOT NULL,
+              "email" TEXT UNIQUE NOT NULL,
+              "passwordHash" TEXT NOT NULL,
+              "role" TEXT NOT NULL DEFAULT 'OWNER',
+              "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+          `);
+          admin = await prisma.storeAdmin.findUnique({
+            where: { email: cleanEmail },
+          });
+        } catch (healErr: any) {
+          console.error("[self-heal] Store creation failed:", healErr?.message);
+          throw dbErr;
+        }
+      } else {
+        throw dbErr;
+      }
+    }
 
     // Auto-seed default store owner if missing
     if (!admin && cleanEmail === "storeadmin@example.com") {

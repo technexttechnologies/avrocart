@@ -269,7 +269,7 @@ export default function CentralAdminLoginPage() {
                     disabled={Boolean(lockoutSeconds && lockoutSeconds > 0) || loading}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@technext.co"
+                    placeholder="Email address"
                     className="w-full px-3.5 py-3 rounded-xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-all font-mono"
                   />
                 </div>
@@ -289,7 +289,7 @@ export default function CentralAdminLoginPage() {
                     disabled={Boolean(lockoutSeconds && lockoutSeconds > 0) || loading}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••••••"
+                    placeholder="Master password"
                     className="w-full px-3.5 py-3 rounded-xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-all font-mono pr-10"
                   />
                   <button

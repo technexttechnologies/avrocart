@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/cart-context";
+import { useWishlist } from "@/context/wishlist-context";
 import {
   ShoppingBag,
   Check,
@@ -10,11 +11,15 @@ import {
   Truck,
   RotateCcw,
   Zap,
+  Heart,
 } from "lucide-react";
 
 export function ProductViewClient({ product }: { product: any }) {
   const router = useRouter();
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
+
+  const isSaved = isInWishlist(product.id);
 
   const [selectedImg, setSelectedImg] = useState(
     product.images?.[0]?.url ||
@@ -194,6 +199,19 @@ export function ProductViewClient({ product }: { product: any }) {
             >
               {added ? <Check className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
               {added ? "Added to Cart" : "Add to Cart"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => toggleWishlist(product)}
+              className={`p-3 rounded-xl border transition-all ${
+                isSaved
+                  ? "bg-rose-50 border-rose-300 text-rose-600"
+                  : "border-slate-300 bg-white hover:bg-slate-50 text-slate-700"
+              }`}
+              title={isSaved ? "Saved in Wishlist" : "Save to Wishlist"}
+            >
+              <Heart className={`w-5 h-5 ${isSaved ? "fill-rose-500 text-rose-500" : ""}`} />
             </button>
           </div>
 

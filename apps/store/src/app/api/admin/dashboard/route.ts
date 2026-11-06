@@ -19,6 +19,8 @@ export async function GET() {
       where: { stockQuantity: { lte: 10 } },
     });
     const totalCustomers = await prisma.storeCustomer.count();
+    const guestCustomers = await prisma.storeCustomer.count({ where: { isGuest: true } });
+    const comboDealsCount = await prisma.product.count({ where: { isComboDeal: true } });
 
     // Sum sales
     const orders = await prisma.order.findMany({
@@ -43,6 +45,8 @@ export async function GET() {
       include: { items: true },
     });
 
+    const aov = totalOrders > 0 ? Math.round(totalSales / totalOrders) : 0;
+
     return NextResponse.json({
       success: true,
       license: licenseStatus,
@@ -57,6 +61,9 @@ export async function GET() {
         totalProducts,
         lowStockProducts,
         totalCustomers,
+        guestCustomers,
+        comboDealsCount,
+        averageOrderValue: aov,
       },
       recentOrders,
     });

@@ -5,6 +5,24 @@ const { execSync } = require("child_process");
 const schemaPath = path.join(__dirname, "../prisma/schema.prisma");
 const envPath = path.join(__dirname, "../.env");
 
+if (fs.existsSync(envPath)) {
+  const content = fs.readFileSync(envPath, "utf8");
+  for (const line of content.split("\n")) {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith("#") && trimmed.includes("=")) {
+      const idx = trimmed.indexOf("=");
+      const key = trimmed.slice(0, idx).trim();
+      let val = trimmed.slice(idx + 1).trim();
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        val = val.slice(1, -1);
+      }
+      if (!process.env[key]) {
+        process.env[key] = val;
+      }
+    }
+  }
+}
+
 if (!fs.existsSync(schemaPath)) {
   console.log("[prepare-prisma] schema.prisma not found at", schemaPath);
   process.exit(0);

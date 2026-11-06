@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { CartProvider } from "@/context/cart-context";
+import { WishlistProvider } from "@/context/wishlist-context";
 import { StoreNav } from "@/components/store-nav";
 import StoreFooter from "@/components/store-footer";
 import { ThemePreviewDock } from "@/components/theme-preview-dock";
@@ -111,17 +112,19 @@ export default async function StoreLayout({
   // Active / Valid License: Normal Storefront
   return (
     <CartProvider>
-      <div
-        className="min-h-screen flex flex-col transition-colors duration-300"
-        style={{
-          fontFamily: theme?.fontFamily || "Inter, -apple-system, sans-serif",
-        }}
-      >
-        <StoreNav theme={theme} />
-        <main className="flex-grow">{children}</main>
-        <StoreFooter theme={theme} />
-        <ThemePreviewDock initialThemeCode={theme?.activeTheme} />
-      </div>
+      <WishlistProvider>
+        <div
+          className="min-h-screen flex flex-col transition-colors duration-300"
+          style={{
+            fontFamily: theme?.fontFamily || "Inter, -apple-system, sans-serif",
+          }}
+        >
+          <StoreNav theme={theme} />
+          <main className="flex-grow">{children}</main>
+          <StoreFooter theme={theme} />
+          <ThemePreviewDock initialThemeCode={theme?.activeTheme} />
+        </div>
+      </WishlistProvider>
     </CartProvider>
   );
 }

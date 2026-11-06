@@ -258,8 +258,19 @@ exports.Prisma.StoreCustomerScalarFieldEnum = {
   name: 'name',
   phone: 'phone',
   passwordHash: 'passwordHash',
+  isGuest: 'isGuest',
+  avatar: 'avatar',
+  lastLoginAt: 'lastLoginAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.WishlistItemScalarFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  guestId: 'guestId',
+  productId: 'productId',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.AddressScalarFieldEnum = {
@@ -400,6 +411,7 @@ exports.Prisma.ModelName = {
   ProductVariant: 'ProductVariant',
   InventoryLog: 'InventoryLog',
   StoreCustomer: 'StoreCustomer',
+  WishlistItem: 'WishlistItem',
   Address: 'Address',
   Order: 'Order',
   OrderItem: 'OrderItem',

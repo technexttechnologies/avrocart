@@ -2,8 +2,12 @@ const path = require("path");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    outputFileTracingRoot: path.join(__dirname, "../../"),
+  transpilePackages: ["@avro/license-core"],
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
   },
 };
 

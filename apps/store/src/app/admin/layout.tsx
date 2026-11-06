@@ -159,6 +159,8 @@ export default function StoreAdminLayout({
   ];
 
   const settingItems = [
+    { label: "Team & User Access", href: "/admin/users", icon: Users },
+    { label: "My Profile & Password", href: "/admin/profile", icon: ShieldCheck },
     { label: "Payment Gateways", href: "/admin/settings/payments", icon: CreditCard },
     { label: "Shipping & Couriers", href: "/admin/settings/shipping", icon: Truck },
     { label: "License & System", href: "/admin/settings/license", icon: Key },
@@ -404,19 +406,23 @@ export default function StoreAdminLayout({
             )}
 
             {/* Admin Profile Chip */}
-            <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
-              <div className="w-8 h-8 rounded-full bg-[#0A192F] text-white flex items-center justify-center font-bold text-xs shadow-2xs">
+            <Link
+              href="/admin/profile"
+              className="flex items-center gap-2 pl-2 border-l border-slate-200 hover:opacity-80 transition cursor-pointer group"
+              title="Edit Username & Password"
+            >
+              <div className="w-8 h-8 rounded-full bg-[#0A192F] text-white flex items-center justify-center font-bold text-xs shadow-2xs group-hover:ring-2 group-hover:ring-[#2563EB] transition">
                 {adminUser?.name ? adminUser.name.charAt(0).toUpperCase() : "S"}
               </div>
               <div className="hidden lg:block text-left">
-                <span className="font-bold text-slate-900 block text-[11px] truncate max-w-[120px]">
+                <span className="font-bold text-slate-900 block text-[11px] truncate max-w-[120px] group-hover:text-[#2563EB] transition">
                   {adminUser?.name || "Administrator"}
                 </span>
                 <span className="text-[10px] text-slate-400 block -mt-0.5 truncate max-w-[120px]">
-                  {adminUser?.role || "OWNER"} • 2FA
+                  {adminUser?.role || "OWNER"} • @{(adminUser as any)?.username || "admin"}
                 </span>
               </div>
-            </div>
+            </Link>
           </div>
         </header>
 

@@ -10,13 +10,19 @@ generator client {
 }
 
 model StoreAdmin {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   name         String
-  email        String   @unique
+  username     String?   @unique
+  email        String    @unique
   passwordHash String
-  role         String   @default("OWNER") // OWNER, MANAGER, STAFF
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  role         String    @default("OWNER") // OWNER, MANAGER, STAFF, SUPPORT
+  status       String    @default("ACTIVE") // ACTIVE, SUSPENDED, INACTIVE
+  phone        String?
+  avatar       String?
+  lastLoginAt  DateTime?
+  lastLoginIp  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model StoreSetting {

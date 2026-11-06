@@ -86,7 +86,7 @@ export default function StoreAdminLoginPage() {
       const res = await fetch("/api/admin/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, step: "CREDENTIALS" }),
+        body: JSON.stringify({ identifier: email, password, step: "CREDENTIALS" }),
       });
 
       const data = await res.json();
@@ -301,16 +301,16 @@ export default function StoreAdminLoginPage() {
               <form onSubmit={handleVerifyCredentials} className="space-y-4 relative">
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Store Administrator Email
+                    Administrator Email or Username
                   </label>
                   <div className="relative">
                     <input
-                      type="email"
+                      type="text"
                       required
                       disabled={Boolean(lockoutSeconds && lockoutSeconds > 0) || loading}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="storeadmin@example.com"
+                      placeholder="storeadmin@example.com or storeadmin"
                       className="w-full bg-[#071324] border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
                     />
                   </div>

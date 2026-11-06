@@ -5,11 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AVRO_THEMES, AvroThemeDefinition } from "@/lib/themes-registry";
 import {
   Palette,
-  ExternalLink,
   Check,
   ChevronUp,
   ChevronDown,
-  Sparkles,
   Zap,
   Sliders,
   CheckCircle2,
@@ -23,14 +21,15 @@ export function ThemePreviewDock({ initialThemeCode }: { initialThemeCode?: stri
   const [isApplying, setIsApplying] = useState(false);
   const [appliedNotice, setAppliedNotice] = useState<string | null>(null);
 
-  const activeThemeCode = currentParam || initialThemeCode || "TALIM_DEFAULT";
+  const activeThemeCode = currentParam || initialThemeCode || "AVRO_SIGNATURE";
   const activeTheme =
     AVRO_THEMES.find(
       (t) =>
         t.code === activeThemeCode ||
         t.id === activeThemeCode ||
         t.id === currentParam ||
-        t.code.toLowerCase() === activeThemeCode.toLowerCase()
+        t.code.toLowerCase() === activeThemeCode.toLowerCase() ||
+        (activeThemeCode.toUpperCase() === "TALIM_DEFAULT" && t.code === "AVRO_SIGNATURE")
     ) || AVRO_THEMES[12];
 
   const handleSelectTheme = (themeId: string) => {
@@ -82,14 +81,6 @@ export function ThemePreviewDock({ initialThemeCode }: { initialThemeCode?: stri
               <span className="text-slate-400">· Select any of the 13 reference industry archetypes</span>
             </div>
             <div className="flex items-center gap-2">
-              <a
-                href={activeTheme.referenceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-blue-400 hover:underline flex items-center gap-1 font-mono"
-              >
-                Inspect {activeTheme.referenceDisplay} <ExternalLink className="w-3 h-3" />
-              </a>
               <button
                 onClick={() => setIsExpanded(false)}
                 className="text-slate-400 hover:text-white p-1"
@@ -187,15 +178,6 @@ export function ThemePreviewDock({ initialThemeCode }: { initialThemeCode?: stri
             <span>Switch Theme ({AVRO_THEMES.length})</span>
             {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
           </button>
-
-          <a
-            href={activeTheme.referenceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden md:flex items-center gap-1 text-[11px] text-blue-400 hover:underline px-2"
-          >
-            Ref <ExternalLink className="w-2.5 h-2.5" />
-          </a>
         </div>
       </div>
     </div>

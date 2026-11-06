@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { ShieldCheck, Truck, Sparkles } from "lucide-react";
+import { ShieldCheck, Truck } from "lucide-react";
 
 export default async function AboutPage() {
   const theme = await prisma.storeThemeSetting.findFirst();

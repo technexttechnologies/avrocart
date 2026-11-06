@@ -1,9 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { ShieldCheck, Truck, RotateCcw, CreditCard, Sparkles } from "lucide-react";
+import { ShieldCheck, Truck, RotateCcw, CreditCard, Award, Heart, Check, Shield } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { AVRO_THEMES } from "@/lib/themes-registry";
+
+function renderTrustIcon(icon: string) {
+  switch (icon) {
+    case "truck":
+      return <Truck className="w-5 h-5" />;
+    case "shield":
+      return <ShieldCheck className="w-5 h-5" />;
+    case "award":
+      return <Award className="w-5 h-5" />;
+    case "refresh":
+      return <RotateCcw className="w-5 h-5" />;
+    case "heart":
+      return <Heart className="w-5 h-5" />;
+    case "check":
+    default:
+      return <Check className="w-5 h-5" />;
+  }
+}
 
 export default function StoreFooter({ theme }: { theme?: any }) {
   const searchParams = useSearchParams();
@@ -13,7 +31,8 @@ export default function StoreFooter({ theme }: { theme?: any }) {
       t.id === previewParam ||
       t.code === previewParam ||
       t.code === theme?.activeTheme ||
-      t.id === theme?.activeTheme
+      t.id === theme?.activeTheme ||
+      (theme?.activeTheme === "TALIM_DEFAULT" && t.code === "AVRO_SIGNATURE")
   ) || AVRO_THEMES[12];
 
   const brandName = theme?.brandName || `${matchingThemeDef.name} Store`;
@@ -59,7 +78,7 @@ export default function StoreFooter({ theme }: { theme?: any }) {
                   color: matchingThemeDef.palette.badgeText,
                 }}
               >
-                <Sparkles className="w-5 h-5" />
+                {renderTrustIcon(badge.icon)}
               </div>
               <div>
                 <strong

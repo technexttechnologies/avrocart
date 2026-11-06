@@ -4,7 +4,6 @@ import {
   ArrowRight,
   ShoppingBag,
   Star,
-  Sparkles,
   Check,
   Shield,
   Truck,
@@ -16,6 +15,24 @@ import {
 } from "lucide-react";
 import { AVRO_THEMES, AvroThemeDefinition } from "@/lib/themes-registry";
 import { ProductCard } from "@/components/product-card";
+
+function renderTrustIcon(icon: string) {
+  switch (icon) {
+    case "truck":
+      return <Truck className="w-5 h-5" />;
+    case "shield":
+      return <Shield className="w-5 h-5" />;
+    case "award":
+      return <Award className="w-5 h-5" />;
+    case "refresh":
+      return <RotateCcw className="w-5 h-5" />;
+    case "heart":
+      return <Heart className="w-5 h-5" />;
+    case "check":
+    default:
+      return <Check className="w-5 h-5" />;
+  }
+}
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -34,17 +51,39 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
   const dbTheme = await prisma.storeThemeSetting.findFirst();
 
   // Find theme definition matching query param OR db setting
-  const activeCode = themeParam || dbTheme?.activeTheme || "TALIM_DEFAULT";
+  const activeCode = themeParam || dbTheme?.activeTheme || "AVRO_SIGNATURE";
   const themeDef: AvroThemeDefinition =
     AVRO_THEMES.find(
       (t) =>
         t.code === activeCode ||
         t.id === activeCode ||
         t.id.toLowerCase() === activeCode.toLowerCase() ||
-        t.code.toLowerCase() === activeCode.toLowerCase()
-    ) || AVRO_THEMES[12]; // Fallback to TaLim Default
+        t.code.toLowerCase() === activeCode.toLowerCase() ||
+        (activeCode.toUpperCase() === "TALIM_DEFAULT" && t.code === "AVRO_SIGNATURE")
+    ) || AVRO_THEMES[12]; // Fallback to AVRO Signature
 
   // Check if DB customizer has overrides
+  let customOverrides: any = {};
+  try {
+    if (dbTheme?.socialLinksJson) {
+      customOverrides = JSON.parse(dbTheme.socialLinksJson);
+    }
+  } catch (e) {}
+
+  const primaryColor = !themeParam && dbTheme?.primaryColor ? dbTheme.primaryColor : themeDef.palette.primary;
+  const accentColor = !themeParam && dbTheme?.accentColor ? dbTheme.accentColor : themeDef.palette.accent;
+  const backgroundColor = !themeParam && customOverrides.backgroundColor ? customOverrides.backgroundColor : themeDef.palette.background;
+  const cardBgColor = !themeParam && customOverrides.cardBg ? customOverrides.cardBg : themeDef.palette.cardBg;
+  const textColor = !themeParam && customOverrides.textColor ? customOverrides.textColor : themeDef.palette.text;
+  const textMutedColor = !themeParam && customOverrides.textMuted ? customOverrides.textMuted : themeDef.palette.textMuted;
+  const buttonRadius = !themeParam && customOverrides.buttonRadius ? customOverrides.buttonRadius : themeDef.typography.buttonRadius;
+  const badgeRadius = !themeParam && customOverrides.badgeRadius ? customOverrides.badgeRadius : themeDef.typography.badgeRadius;
+  const heroBadge = !themeParam && customOverrides.heroBadge ? customOverrides.heroBadge : themeDef.hero.badge;
+  const headlineHighlight = !themeParam && customOverrides.headlineHighlight !== undefined ? customOverrides.headlineHighlight : themeDef.hero.headlineHighlight;
+  const ctaPrimary = !themeParam && customOverrides.ctaPrimary ? customOverrides.ctaPrimary : themeDef.hero.ctaPrimary;
+  const ctaSecondary = !themeParam && customOverrides.ctaSecondary ? customOverrides.ctaSecondary : themeDef.hero.ctaSecondary;
+  const trustBadges = !themeParam && Array.isArray(customOverrides.trustBadges) && customOverrides.trustBadges.length > 0 ? customOverrides.trustBadges : themeDef.trustBadges;
+
   const headline = dbTheme?.bannerHeadline && !themeParam ? dbTheme.bannerHeadline : themeDef.hero.headline;
   const subheadline = dbTheme?.bannerSubheadline && !themeParam ? dbTheme.bannerSubheadline : themeDef.hero.subheadline;
   const heroImage = dbTheme?.bannerImageUrl && !themeParam ? dbTheme.bannerImageUrl : themeDef.hero.imageUrl;
@@ -69,8 +108,8 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
     <div
       className="space-y-16 pb-24 transition-colors duration-300"
       style={{
-        backgroundColor: themeDef.palette.background,
-        color: themeDef.palette.text,
+        backgroundColor: backgroundColor,
+        color: textColor,
       }}
     >
       {/* 1. HERO SECTION */}
@@ -81,7 +120,7 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
             : "py-16 sm:py-24 text-slate-900 border-black/5"
         }`}
         style={{
-          backgroundColor: isDarkHero ? themeDef.palette.cardBg : themeDef.palette.background,
+          backgroundColor: isDarkHero ? cardBgColor : backgroundColor,
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -95,31 +134,31 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
                   backgroundColor: themeDef.palette.badgeBg,
                   color: themeDef.palette.badgeText,
                   borderRadius:
-                    themeDef.typography.badgeRadius === "rounded-full"
+                    badgeRadius === "rounded-full"
                       ? "9999px"
-                      : themeDef.typography.badgeRadius === "rounded-none"
+                      : badgeRadius === "rounded-none"
                       ? "0px"
                       : "8px",
                 }}
               >
-                <Sparkles className="w-3.5 h-3.5" />
-                {themeDef.hero.badge}
+                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-80" />
+                {heroBadge}
               </div>
 
               {/* Headline */}
               <h1
                 className={`text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight ${themeDef.typography.headingClass}`}
                 style={{
-                  color: isDarkHero ? "#FFFFFF" : themeDef.palette.text,
+                  color: isDarkHero ? "#FFFFFF" : textColor,
                 }}
               >
                 {headline}{" "}
-                {themeDef.hero.headlineHighlight && (
+                {headlineHighlight && (
                   <span
                     className="italic font-serif"
-                    style={{ color: themeDef.palette.accent }}
+                    style={{ color: accentColor }}
                   >
-                    {themeDef.hero.headlineHighlight}
+                    {headlineHighlight}
                   </span>
                 )}
               </h1>
@@ -128,7 +167,7 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
               <p
                 className="text-base sm:text-lg max-w-xl leading-relaxed"
                 style={{
-                  color: isDarkHero ? "#CBD5E1" : themeDef.palette.textMuted,
+                  color: isDarkHero ? "#CBD5E1" : textMutedColor,
                 }}
               >
                 {subheadline}
@@ -140,16 +179,16 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
                   href="/shop"
                   className="px-6 py-3.5 font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-md text-white hover:opacity-95"
                   style={{
-                    backgroundColor: themeDef.palette.primary,
+                    backgroundColor: primaryColor,
                     borderRadius:
-                      themeDef.typography.buttonRadius === "rounded-full"
+                      buttonRadius === "rounded-full"
                         ? "9999px"
-                        : themeDef.typography.buttonRadius === "rounded-none"
+                        : buttonRadius === "rounded-none"
                         ? "0px"
                         : "12px",
                   }}
                 >
-                  {themeDef.hero.ctaPrimary}
+                  {ctaPrimary}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
 
@@ -159,31 +198,17 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
                   style={{
                     borderColor: isDarkHero ? "rgba(255,255,255,0.2)" : themeDef.palette.border,
                     backgroundColor: isDarkHero ? "rgba(255,255,255,0.05)" : "#FFFFFF",
-                    color: isDarkHero ? "#FFFFFF" : themeDef.palette.text,
+                    color: isDarkHero ? "#FFFFFF" : textColor,
                     borderRadius:
-                      themeDef.typography.buttonRadius === "rounded-full"
+                      buttonRadius === "rounded-full"
                         ? "9999px"
-                        : themeDef.typography.buttonRadius === "rounded-none"
+                        : buttonRadius === "rounded-none"
                         ? "0px"
                         : "12px",
                   }}
                 >
-                  {themeDef.hero.ctaSecondary}
+                  {ctaSecondary}
                 </Link>
-              </div>
-
-              {/* Micro Reference Badge */}
-              <div className="pt-4 flex items-center gap-2 text-xs">
-                <span className="text-slate-400">Reference Archetype:</span>
-                <a
-                  href={themeDef.referenceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-mono text-xs hover:underline flex items-center gap-1 font-semibold"
-                  style={{ color: themeDef.palette.accent }}
-                >
-                  {themeDef.referenceDisplay} <ExternalLink className="w-3 h-3" />
-                </a>
               </div>
             </div>
 
@@ -233,11 +258,11 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
         <div
           className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 rounded-2xl border transition-colors shadow-xs"
           style={{
-            backgroundColor: themeDef.palette.cardBg,
+            backgroundColor: cardBgColor,
             borderColor: themeDef.palette.border,
           }}
         >
-          {themeDef.trustBadges.map((badge, idx) => (
+          {trustBadges.map((badge: any, idx: number) => (
             <div key={idx} className="flex items-center gap-3">
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center font-bold flex-shrink-0 shadow-inner"
@@ -246,16 +271,16 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
                   color: themeDef.palette.badgeText,
                 }}
               >
-                <Sparkles className="w-5 h-5" />
+                {renderTrustIcon(badge.icon)}
               </div>
               <div>
                 <strong
                   className="block text-xs font-extrabold"
-                  style={{ color: themeDef.palette.text }}
+                  style={{ color: textColor }}
                 >
                   {badge.title}
                 </strong>
-                <span className="text-[11px]" style={{ color: themeDef.palette.textMuted }}>
+                <span className="text-[11px]" style={{ color: textMutedColor }}>
                   {badge.subtitle}
                 </span>
               </div>

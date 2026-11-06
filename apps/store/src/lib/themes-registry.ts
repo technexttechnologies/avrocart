@@ -47,7 +47,7 @@ export interface AvroThemeDefinition {
   trustBadges: {
     title: string;
     subtitle: string;
-    icon: "truck" | "shield" | "sparkles" | "refresh" | "award" | "heart" | "check";
+    icon: "truck" | "shield" | "refresh" | "award" | "heart" | "check";
   }[];
   sampleCategories: {
     name: string;
@@ -74,8 +74,8 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     code: "FASHION_NOIR",
     name: "Noir",
     industry: "Fashion & Apparel",
-    referenceUrl: "https://noir.store.technotalim.in",
-    referenceDisplay: "noir.store.technotalim.in",
+    referenceUrl: "#",
+    referenceDisplay: "AVRO Native Archetype",
     tagline: "Where Trends Meet Comfort — Curated Modern Silhouette",
     description: "Monochrome luxury streetwear and contemporary high fashion. Features editorial lookbooks, oversized typography, minimalist monochrome grids, and effortless product switching.",
     isIncludedInFree: true,
@@ -119,7 +119,7 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
       { title: "Complimentary Delivery", subtitle: "On domestic orders over ₹2,499", icon: "truck" },
       { title: "30-Day Easy Returns", subtitle: "Hassle-free doorstep pickup", icon: "refresh" },
       { title: "Sustainably Sourced", subtitle: "100% certified organic cotton", icon: "award" },
-      { title: "Artisan Tailored", subtitle: "Crafted in small ethical batches", icon: "sparkles" },
+      { title: "Artisan Tailored", subtitle: "Crafted in small ethical batches", icon: "award" },
     ],
     sampleCategories: [
       { name: "Heavyweight Tops", slug: "tops", itemCount: "28 items", imageUrl: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=400&q=80" },
@@ -141,8 +141,8 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     code: "ELECTRONICS_VOLT",
     name: "Volt",
     industry: "Consumer Electronics & Gadgets",
-    referenceUrl: "https://volt.store.technotalim.in",
-    referenceDisplay: "volt.store.technotalim.in",
+    referenceUrl: "#",
+    referenceDisplay: "AVRO Native Archetype",
     tagline: "Grab Upto 50% Off On Selected Gadgets — High Performance Tech",
     description: "High-contrast technical dark theme built for high-tech audio, computing peripherals, smart wearables, and gaming hardware. Features spec tables, deal timers, and instant tech pills.",
     isIncludedInFree: true,
@@ -208,8 +208,8 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     code: "GROCERY_FRESH",
     name: "Grocery",
     industry: "Grocery & Daily Fresh",
-    referenceUrl: "https://grocery.store.technotalim.in",
-    referenceDisplay: "grocery.store.technotalim.in",
+    referenceUrl: "#",
+    referenceDisplay: "AVRO Native Archetype",
     tagline: "All Your Daily Essentials, Farm-Fresh Delivered",
     description: "Vibrant emerald green theme designed for supermarkets, organic food delivery, fruits, vegetables, and pantry essentials. Features quick weight selectors, farm-to-table origin badges, and recurring basket building.",
     isIncludedInFree: true,
@@ -275,8 +275,8 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     code: "COSMETICS_VELORA",
     name: "Velora",
     industry: "Cosmetics & Skincare",
-    referenceUrl: "https://cosmetics.store.technotalim.in",
-    referenceDisplay: "cosmetics.store.technotalim.in",
+    referenceUrl: "#",
+    referenceDisplay: "AVRO Native Archetype",
     tagline: "Radiance Becomes You — Pure Botanical Luxury",
     description: "Soft rose blush and warm cream tones designed for skincare, organic cosmetics, and dermatologist formulations. Features routine builder steps, clinical trial stats, and vegan cruelty-free seals.",
     isIncludedInFree: true,
@@ -318,7 +318,7 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     },
     trustBadges: [
       { title: "Clinically Verified", subtitle: "97% visible radiance in 14 days", icon: "award" },
-      { title: "Clean & Vegan Certified", subtitle: "Free of parabens and sulfates", icon: "sparkles" },
+      { title: "Clean & Vegan Certified", subtitle: "Free of parabens and sulfates", icon: "award" },
       { title: "Dermatologist Tested", subtitle: "Hypoallergenic for sensitive skin", icon: "shield" },
       { title: "Cruelty-Free Leaping Bunny", subtitle: "Never tested on animals", icon: "heart" },
     ],
@@ -342,8 +342,8 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     code: "JEWELRY_AURELLE",
     name: "Aurelle",
     industry: "Fine Jewelry & Heirlooms",
-    referenceUrl: "https://jewellery.store.technotalim.in",
-    referenceDisplay: "jewellery.store.technotalim.in",
+    referenceUrl: "#",
+    referenceDisplay: "AVRO Native Archetype",
     tagline: "Jewelry That Tells Your Timeless Story",
     description: "Opulent champagne gold and deep obsidian theme designed for fine gold, solitaires, lab-grown diamonds, and luxury heirloom ornaments. Features BIS Hallmark certs, karat selectors, and gift wrapping options.",
     isIncludedInFree: true,
@@ -387,7 +387,7 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
       { title: "100% BIS Hallmarked", subtitle: "Official government purity stamp", icon: "award" },
       { title: "Insured Transit", subtitle: "100% covered till delivery", icon: "shield" },
       { title: "Lifetime Exchange", subtitle: "Full value exchange policy", icon: "refresh" },
-      { title: "Certified Diamonds", subtitle: "IGI / GIA authenticated certificates", icon: "sparkles" },
+      { title: "Certified Diamonds", subtitle: "IGI / GIA authenticated certificates", icon: "award" },
     ],
     sampleCategories: [
       { name: "Solitaire Rings", slug: "rings", itemCount: "38 items", imageUrl: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=400&q=80" },
@@ -409,8 +409,8 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     code: "FITNESS_FORGE",
     name: "Forge",
     industry: "Fitness & Athletic Performance",
-    referenceUrl: "https://fitness.store.technotalim.in",
-    referenceDisplay: "fitness.store.technotalim.in",
+    referenceUrl: "#",
+    referenceDisplay: "AVRO Native Archetype",
     tagline: "BECOME A MEMBER AND TRAIN — Iron Sharpens Iron",
     description: "High-voltage athletic theme designed for gym apparel, lifting belts, strength equipment, and sports nutrition. High-impact dark mode with crimson accents and condensed athletic typography.",
     isIncludedInFree: true,
@@ -454,7 +454,7 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
       { title: "Military Grade Stitching", subtitle: "Reinforced 4-way stress points", icon: "shield" },
       { title: "Lab Tested Clean", subtitle: "Zero banned substances in nutrition", icon: "award" },
       { title: "Free Exchanges", subtitle: "Quick size exchange guarantee", icon: "refresh" },
-      { title: "Elite Athlete Approved", subtitle: "Tested by champion powerlifters", icon: "sparkles" },
+      { title: "Elite Athlete Approved", subtitle: "Tested by champion powerlifters", icon: "award" },
     ],
     sampleCategories: [
       { name: "Heavyweight Tees", slug: "pump-covers", itemCount: "22 items", imageUrl: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=400&q=80" },
@@ -476,8 +476,8 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     code: "HOME_HEARTH",
     name: "Hearth",
     industry: "Home Decor & Furnishings",
-    referenceUrl: "https://home-living.store.technotalim.in",
-    referenceDisplay: "home-living.store.technotalim.in",
+    referenceUrl: "#",
+    referenceDisplay: "AVRO Native Archetype",
     tagline: "Make Room for the Everyday — Small Details. A Softer Day.",
     description: "Warm sand, terracotta, oat, and calm sage tones designed for home decor, artisanal furniture, handcrafted rugs, and kitchenware. Room-by-room collections and serene lifestyle imagery.",
     isIncludedInFree: true,
@@ -519,7 +519,7 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     },
     trustBadges: [
       { title: "Solid Hardwood", subtitle: "Sustainably harvested oak & teak", icon: "award" },
-      { title: "Free Swatch Samples", subtitle: "Test fabrics in your lighting", icon: "sparkles" },
+      { title: "Free Swatch Samples", subtitle: "Test fabrics in your lighting", icon: "award" },
       { title: "White-Glove Delivery", subtitle: "Unpacking & assembly in room", icon: "truck" },
       { title: "Built to Last Decades", subtitle: "5-Year structural warranty", icon: "shield" },
     ],
@@ -543,8 +543,8 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     code: "BABY_LITTLE_STEPS",
     name: "Little Steps",
     industry: "Baby, Kids & Nursery",
-    referenceUrl: "https://baby-kids.store.technotalim.in",
-    referenceDisplay: "baby-kids.store.technotalim.in",
+    referenceUrl: "#",
+    referenceDisplay: "AVRO Native Archetype",
     tagline: "Little Moments Big Tomorrows — Non-Toxic, Pure & Gentle",
     description: "Cheerful pastel sunshine yellow, soft sky blue, and baby mint designed for infant clothing, montessori wooden toys, nursery decor, and stroller gear. Features age filter pills and baby-safe badges.",
     isIncludedInFree: true,
@@ -610,8 +610,8 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     code: "CRAFTS_MADE_FOUND",
     name: "Made & Found",
     industry: "Artisan Crafts & Handmade Ceramics",
-    referenceUrl: "https://made-found.store.technotalim.in",
-    referenceDisplay: "made-found.store.technotalim.in",
+    referenceUrl: "#",
+    referenceDisplay: "AVRO Native Archetype",
     tagline: "Handmade Porcelain and Stoneware Goods — Meet The Maker",
     description: "Earthy raw ceramic clay, warm oatmeal, and olive green theme tailored for studio potters, wood turners, hand weavers, and craft artisans. Features maker studio provenance, batch numbers, and studio workshop classes.",
     isIncludedInFree: true,
@@ -655,7 +655,7 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
       { title: "Wheel-Thrown by Hand", subtitle: "Unique fingerprint in every piece", icon: "award" },
       { title: "Food & Microwave Safe", subtitle: "Lead-free non-toxic glazes", icon: "shield" },
       { title: "Zero-Plastic Packaging", subtitle: "Packed in molded paper pulp", icon: "heart" },
-      { title: "Direct Maker Support", subtitle: "100% of proceeds support our studio", icon: "sparkles" },
+      { title: "Direct Maker Support", subtitle: "100% of proceeds support our studio", icon: "award" },
     ],
     sampleCategories: [
       { name: "Coffee & Matcha Cups", slug: "cups", itemCount: "26 items", imageUrl: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80" },
@@ -677,8 +677,8 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     code: "TRAVEL_TRAIL",
     name: "Trail",
     industry: "Outdoor, Hiking & Travel Gear",
-    referenceUrl: "https://travel-outdoor.store.technotalim.in",
-    referenceDisplay: "travel-outdoor.store.technotalim.in",
+    referenceUrl: "#",
+    referenceDisplay: "AVRO Native Archetype",
     tagline: "Get Out There — Built for the Long Trail.",
     description: "Rugged alpine forest green and granite slate theme built for trekking packs, ultralight tents, technical shells, camping cookware, and expedition travel gear. Includes weather ratings and trail spec tags.",
     isIncludedInFree: true,
@@ -721,7 +721,7 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     trustBadges: [
       { title: "Lifetime Field Repair", subtitle: "We fix trail wear and tear for life", icon: "shield" },
       { title: "IPX8 Submersible Spec", subtitle: "Tested in extreme monsoons", icon: "award" },
-      { title: "Ultralight Carbon Fiber", subtitle: "Gram-conscious backpacking", icon: "sparkles" },
+      { title: "Ultralight Carbon Fiber", subtitle: "Gram-conscious backpacking", icon: "award" },
       { title: "Leave No Trace Partner", subtitle: "1% of all revenue given to trails", icon: "heart" },
     ],
     sampleCategories: [
@@ -744,8 +744,8 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     code: "PET_PAWS",
     name: "Paws",
     industry: "Pet Supplies, Food & Accessories",
-    referenceUrl: "https://pet-supplies.store.technotalim.in",
-    referenceDisplay: "pet-supplies.store.technotalim.in",
+    referenceUrl: "#",
+    referenceDisplay: "AVRO Native Archetype",
     tagline: "Everyday Life With Your Pet — Made for the Daily Walk.",
     description: "Warm companion amber, soft teal, and friendly cream theme built for raw nutrition, indestructible chew toys, ergonomic harness sets, and cat scratching towers. Includes Dog/Cat filter toggles and vet seals.",
     isIncludedInFree: true,
@@ -811,8 +811,8 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     code: "MOBILES_ARMOR",
     name: "Armor",
     industry: "Mobiles, Cases & Tech Accessories",
-    referenceUrl: "https://mobiles-accessories.store.technotalim.in",
-    referenceDisplay: "mobiles-accessories.store.technotalim.in",
+    referenceUrl: "#",
+    referenceDisplay: "AVRO Native Archetype",
     tagline: "Protection for the Phone You Live On — Serious Protection, Considered Design.",
     description: "Carbon fiber graphite and titanium slate theme engineered for shockproof phone cases, MagSafe power stations, sapphire screen guards, and braided Kevlar cables. Features device model pickers (iPhone 16, S25 Ultra) and 15ft drop tests.",
     isIncludedInFree: true,
@@ -854,7 +854,7 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     },
     trustBadges: [
       { title: "15FT Drop Protection", subtitle: "Exceeds US military drop tests", icon: "shield" },
-      { title: "MagSafe Neodymium Array", subtitle: "2X stronger magnetic hold", icon: "sparkles" },
+      { title: "MagSafe Neodymium Array", subtitle: "2X stronger magnetic hold", icon: "award" },
       { title: "Lifetime Case Warranty", subtitle: "No yellowing or peeling promise", icon: "award" },
       { title: "Precision CNC Cutouts", subtitle: "Tactile click titanium buttons", icon: "check" },
     ],
@@ -872,14 +872,14 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
     ],
   },
 
-  // 13. OTHERS / GENERAL - TALIM DEFAULT
+  // 13. GENERAL RETAIL - AVRO SIGNATURE
   {
-    id: "talim-default",
-    code: "TALIM_DEFAULT",
-    name: "TaLim Default",
+    id: "avro-signature",
+    code: "AVRO_SIGNATURE",
+    name: "AVRO Signature",
     industry: "General Retail & Modern All-Purpose",
-    referenceUrl: "https://talim-default.store.technotalim.in",
-    referenceDisplay: "talim-default.store.technotalim.in",
+    referenceUrl: "#",
+    referenceDisplay: "AVRO Native Archetype",
     tagline: "Find Your Next Favourite — The Versatile Multi-Category Standard",
     description: "Clean modern navy and crisp white commerce base suitable for any catalog. Balanced whitespace, multi-category carousels, responsive facet filters, and maximum conversion rates.",
     isIncludedInFree: true,
@@ -944,5 +944,5 @@ export function getThemeById(idOrCode: string): AvroThemeDefinition {
   const found = AVRO_THEMES.find(
     (t) => t.id === idOrCode || t.code === idOrCode || t.id.toLowerCase() === idOrCode.toLowerCase()
   );
-  return found || AVRO_THEMES[12]; // Fallback to TaLim Default
+  return found || AVRO_THEMES[12]; // Fallback to AVRO Signature
 }

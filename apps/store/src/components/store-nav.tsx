@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ShoppingBag, ShieldCheck, Menu, X, Sparkles } from "lucide-react";
+import { ShoppingBag, ShieldCheck, Menu, X } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { useState } from "react";
 import { AVRO_THEMES, AvroThemeDefinition } from "@/lib/themes-registry";
@@ -19,7 +19,8 @@ export function StoreNav({ theme }: { theme?: any }) {
       t.id === previewParam ||
       t.code === previewParam ||
       t.code === theme?.activeTheme ||
-      t.id === theme?.activeTheme
+      t.id === theme?.activeTheme ||
+      (theme?.activeTheme === "TALIM_DEFAULT" && t.code === "AVRO_SIGNATURE")
   ) || AVRO_THEMES[12];
 
   const brandName = theme?.brandName || `${matchingThemeDef.name} Store`;

@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   Truck,
   RotateCcw,
-  Sparkles,
   Zap,
 } from "lucide-react";
 

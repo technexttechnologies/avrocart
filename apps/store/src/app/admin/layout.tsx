@@ -31,6 +31,7 @@ import {
   Loader2,
   PackagePlus,
   UploadCloud,
+  BookOpen,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -159,6 +160,7 @@ export default function StoreAdminLayout({
     { label: "Media & Asset Library", href: "/admin/media", icon: UploadCloud },
     { label: "Sales Reports", href: "/admin/reports", icon: BarChart3 },
     { label: "Theme Customizer", href: "/admin/themes", icon: Palette },
+    { label: "Merchant Admin Guide", href: "/admin/guide", icon: BookOpen },
   ];
 
   const settingItems = [

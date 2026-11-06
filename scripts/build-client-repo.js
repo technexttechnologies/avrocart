@@ -55,7 +55,7 @@ if (pkg.dependencies) {
   delete pkg.dependencies["@avro/license-core"];
 }
 pkg.name = "avrostore";
-pkg.description = "AVRO — Self-Hosted Customer Storefront & Merchant Backoffice Engine";
+pkg.description = "AVRO — Self-Hosted Customer Storefront & Merchant Admin Panel Engine";
 pkg.repository = {
   type: "git",
   url: "https://github.com/technexttechnologies/avrostore.git",
@@ -84,7 +84,7 @@ fs.writeFileSync(tsconfigPath, JSON.stringify(tsconfig, null, 2), "utf8");
 // 4. Create standalone Dockerfile
 console.log("4. Writing standalone Dockerfile...");
 const dockerfileContent = `# ==============================================================================
-# AVRO CUSTOMER STOREFRONT & BACKOFFICE — PRODUCTION DOCKERFILE
+# AVRO CUSTOMER STOREFRONT & ADMIN PANEL — PRODUCTION DOCKERFILE
 # ==============================================================================
 
 FROM node:20-alpine AS base
@@ -232,7 +232,7 @@ fs.copyFileSync(path.join(deployDir, "ecosystem.config.js"), path.join(targetRep
 // 7. Write clean .env.example
 console.log("7. Writing clean .env.example...");
 const envExampleContent = `# ==============================================================================
-# AVRO CUSTOMER STOREFRONT & BACKOFFICE — PRODUCTION ENVIRONMENT TEMPLATE
+# AVRO CUSTOMER STOREFRONT & ADMIN PANEL — PRODUCTION ENVIRONMENT TEMPLATE
 # ==============================================================================
 
 # Database Connection (PostgreSQL 14+ / Supabase / Neon / Railway / AWS RDS)
@@ -332,7 +332,7 @@ NC='\\033[0m'
 
 clear
 echo -e "\${CYAN}================================================================\${NC}"
-echo -e "\${CYAN}       AVRO STOREFRONT & MERCHANT BACKOFFICE DEPLOYER           \${NC}"
+echo -e "\${CYAN}       AVRO STOREFRONT & MERCHANT ADMIN PANEL DEPLOYER          \${NC}"
 echo -e "\${CYAN}             TECHNEXT TECHNOLOGIES COMMERCE ENGINE              \${NC}"
 echo -e "\${CYAN}================================================================\${NC}"
 echo ""
@@ -356,7 +356,7 @@ if [ "$MODE" = "1" ]; then
     docker compose up -d --build
     echo -e "\\n\${GREEN}================================================================\${NC}"
     echo -e "\${GREEN}Storefront Running at: http://localhost:3001\${NC}"
-    echo -e "\${GREEN}Admin Backoffice:      http://localhost:3001/admin/login\${NC}"
+    echo -e "\${GREEN}Admin Panel:           http://localhost:3001/admin/login\${NC}"
     echo -e "\${GREEN}Default Admin Login:   storeadmin@example.com / storeadmin123\${NC}"
     echo -e "\${GREEN}================================================================\${NC}"
     exit 0
@@ -390,7 +390,7 @@ fs.writeFileSync(path.join(targetRepoDir, "deploy.sh"), deployShContent, "utf8")
 const deployBatContent = `@echo off
 title AVRO Storefront Deployer
 echo ================================================================
-echo       AVRO STOREFRONT & MERCHANT BACKOFFICE DEPLOYER
+echo       AVRO STOREFRONT & MERCHANT ADMIN PANEL DEPLOYER
 echo             TECHNEXT TECHNOLOGIES COMMERCE ENGINE
 echo ================================================================
 echo.
@@ -415,7 +415,7 @@ if "%MODE%"=="1" (
     echo.
     echo ================================================================
     echo Storefront Running at: http://localhost:3001
-    echo Admin Backoffice:      http://localhost:3001/admin/login
+    echo Admin Panel:           http://localhost:3001/admin/login
     echo Default Admin Login:   storeadmin@example.com / storeadmin123
     echo ================================================================
     pause
@@ -454,7 +454,7 @@ fs.writeFileSync(path.join(targetRepoDir, "deploy.bat"), deployBatContent, "utf8
 
 // 10. Write comprehensive Client README.md
 console.log("10. Writing client README.md and QUICK_START.md...");
-const readmeContent = `# AVRO Storefront & Merchant Backoffice Engine
+const readmeContent = `# AVRO Storefront & Merchant Admin Panel Engine
 
 > **Self-hosted, autonomous commerce platform engineered for independent merchants, fast-growing brands, and digital creators.**
 
@@ -477,9 +477,9 @@ Developed by **TECHNEXT TECHNOLOGIES**, **AVRO** gives you complete ownership ov
   - PhonePe (Direct UPI, QR code)
   - Direct Bank Transfer / Manual UPI
 
-### Merchant Administration Backoffice (\`/admin\`)
+### Merchant Administration Panel (\`/admin\`)
 - **Order Fulfillment & Management**:
-  - Create manual & draft orders directly from the backoffice with catalog product picker.
+  - Create manual & draft orders directly from the admin panel with catalog product picker.
   - Edit existing orders (customer contact details, shipping addresses, fulfillment statuses, line items).
   - Print industry-standard thermal **4"x6" courier shipping labels**.
   - Generate GST-compliant **tax invoices**.
@@ -541,8 +541,8 @@ npm run db:seed
 npm run dev
 \`\`\`
 - Storefront: \`http://localhost:3001\`
-- Admin Backoffice: \`http://localhost:3001/admin\`
-- Default Backoffice Login:
+- Admin Panel: \`http://localhost:3001/admin\`
+- Default Admin Login:
   - **Email**: \`storeadmin@example.com\`
   - **Password**: \`storeadmin123\`
 
@@ -620,7 +620,7 @@ npm run db:seed
 npm run dev
 \`\`\`
 
-### 3. Log In to Backoffice
+### 3. Log In to Admin Panel
 - Open: \`http://localhost:3001/admin\`
 - Email: \`storeadmin@example.com\`
 - Password: \`storeadmin123\`

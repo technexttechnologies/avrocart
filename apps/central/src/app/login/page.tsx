@@ -125,6 +125,12 @@ export default function LoginPage() {
               </button>
             </form>
           )}
+
+          <div className="pt-2 text-center">
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              POWERED BY AVRO BY TECHNEXT
+            </span>
+          </div>
         </div>
       </main>
 

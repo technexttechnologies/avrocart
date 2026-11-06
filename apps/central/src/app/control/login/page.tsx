@@ -17,7 +17,6 @@ import {
   Fingerprint,
   Cpu,
   Clock,
-  Sparkles,
   Server,
 } from "lucide-react";
 
@@ -344,7 +343,7 @@ export default function CentralAdminLoginPage() {
                   }}
                   className="text-[11px] text-slate-400 hover:text-blue-300 font-mono transition-colors inline-flex items-center gap-1"
                 >
-                  <Sparkles className="w-3 h-3 text-amber-400" />
+                  <Key className="w-3 h-3 text-blue-400" />
                   Prefill Master Credentials (admin@technext.co)
                 </button>
               </div>
@@ -427,8 +426,9 @@ export default function CentralAdminLoginPage() {
       </main>
 
       {/* Footer */}
-      <footer className="px-6 py-4 border-t border-white/5 text-center text-xs text-slate-500 relative z-10">
-        © 2026 AVRO by TECHNEXT TECHNOLOGIES. Restricted Access. Unauthorized access will be prosecuted.
+      <footer className="px-6 py-4 border-t border-white/5 text-center text-xs text-slate-500 relative z-10 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <span className="font-semibold text-slate-400">POWERED BY AVRO BY TECHNEXT</span>
+        <span>© {new Date().getFullYear()} TECHNEXT TECHNOLOGIES. Restricted Access.</span>
       </footer>
     </div>
   );

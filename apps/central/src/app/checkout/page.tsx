@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { PublicNav } from "@/components/public-nav";
@@ -18,7 +18,9 @@ import {
   Tag,
 } from "lucide-react";
 
-export default function CheckoutPage() {
+export const dynamic = "force-dynamic";
+
+function CheckoutContent() {
   const searchParams = useSearchParams();
   const initialPlan = searchParams.get("plan") || "GROW";
   const initialDuration = searchParams.get("duration") || "YEARLY";
@@ -409,5 +411,22 @@ export default function CheckoutPage() {
 
       <PublicFooter />
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center text-xs text-slate-500">
+          <div className="flex items-center gap-2">
+            <Loader2 className="w-5 h-5 animate-spin text-[#2563EB]" />
+            <span>Loading checkout session...</span>
+          </div>
+        </div>
+      }
+    >
+      <CheckoutContent />
+    </Suspense>
   );
 }

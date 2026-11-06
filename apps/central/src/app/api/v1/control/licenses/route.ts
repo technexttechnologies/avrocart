@@ -30,7 +30,11 @@ export async function GET() {
       select: { id: true, name: true, email: true },
     });
 
-    return NextResponse.json({ success: true, licenses, validationLogs, customers });
+    const plans = await prisma.plan.findMany({
+      select: { id: true, tier: true, name: true },
+    });
+
+    return NextResponse.json({ success: true, licenses, validationLogs, customers, plans });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
@@ -39,7 +43,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { customerId, planTier = "GROW", durationDays = 365 } = body;
+    const { customerId, planTier = "GROW", durationDays = 365, boundDomain } = body;
 
     const plan = await prisma.plan.findUnique({ where: { tier: planTier } });
     if (!plan) {
@@ -56,7 +60,7 @@ export async function POST(req: NextRequest) {
         planId: plan.id,
         duration: "YEARLY",
         status: "ACTIVE",
-        amount: 5750,
+        amount: planTier === "PLUS" ? 12500 : planTier === "GROW" ? 5750 : 2499,
         currency: "INR",
         startDate: new Date(),
         endDate: expiresAt,
@@ -72,6 +76,7 @@ export async function POST(req: NextRequest) {
         customerId,
         subscriptionId: sub.id,
         planTier,
+        boundDomain: boundDomain ? boundDomain.trim() : null,
         status: "ACTIVE",
         expiresAt,
       },
@@ -86,11 +91,64 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id, action, newDomain, extendDays } = body;
+    const {
+      id,
+      action = "EDIT",
+      newDomain,
+      extendDays,
+      customerId,
+      planTier,
+      status,
+      boundDomain,
+      expiresAt,
+      licenseKey,
+    } = body;
 
-    const license = await prisma.license.findUnique({ where: { id } });
+    const license = await prisma.license.findUnique({
+      where: { id },
+      include: { subscription: true },
+    });
+
     if (!license) {
       return NextResponse.json({ success: false, error: "License not found." }, { status: 404 });
+    }
+
+    if (action === "EDIT") {
+      const updateData: any = {};
+
+      if (customerId) updateData.customerId = customerId;
+      if (status) updateData.status = status;
+      if (boundDomain !== undefined) {
+        updateData.boundDomain = boundDomain ? boundDomain.trim() : null;
+      }
+      if (licenseKey) updateData.licenseKey = licenseKey.trim();
+      if (expiresAt) updateData.expiresAt = new Date(expiresAt);
+
+      if (planTier && planTier !== license.planTier) {
+        updateData.planTier = planTier;
+        const matchingPlan = await prisma.plan.findUnique({ where: { tier: planTier } });
+        if (matchingPlan && license.subscriptionId) {
+          await prisma.subscription.update({
+            where: { id: license.subscriptionId },
+            data: { planId: matchingPlan.id },
+          });
+        }
+      }
+
+      const updated = await prisma.license.update({
+        where: { id },
+        data: updateData,
+        include: {
+          customer: true,
+          subscription: { include: { plan: true } },
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: "License details successfully updated.",
+        license: updated,
+      });
     }
 
     if (action === "SUSPEND") {
@@ -107,9 +165,40 @@ export async function PUT(req: NextRequest) {
       const current = new Date(license.expiresAt);
       current.setDate(current.getDate() + parseInt(extendDays));
       await prisma.license.update({ where: { id }, data: { expiresAt: current, status: "ACTIVE" } });
+    } else if (action === "UPGRADE_PLAN" && planTier) {
+      const matchingPlan = await prisma.plan.findUnique({ where: { tier: planTier } });
+      await prisma.license.update({
+        where: { id },
+        data: { planTier, status: "ACTIVE" },
+      });
+      if (matchingPlan && license.subscriptionId) {
+        await prisma.subscription.update({
+          where: { id: license.subscriptionId },
+          data: { planId: matchingPlan.id },
+        });
+      }
     }
 
     return NextResponse.json({ success: true, message: `License action '${action}' applied.` });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: "License ID is required." }, { status: 400 });
+    }
+
+    // Delete validation logs first to ensure clean cascade
+    await prisma.licenseValidationLog.deleteMany({ where: { licenseId: id } });
+    await prisma.license.delete({ where: { id } });
+
+    return NextResponse.json({ success: true, message: "License deleted successfully." });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }

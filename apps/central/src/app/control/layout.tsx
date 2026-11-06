@@ -22,6 +22,7 @@ import {
   Lock,
   Loader2,
   ShieldAlert,
+  Receipt,
 } from "lucide-react";
 
 interface AdminUser {
@@ -120,6 +121,7 @@ export default function ControlLayout({
     { label: "Fleet Telemetry & Nodes", href: "/control/telemetry", icon: Radio },
     { label: "Customer Accounts", href: "/control/customers", icon: Users },
     { label: "Subscriptions", href: "/control/subscriptions", icon: CreditCard },
+    { label: "Payment Management", href: "/control/payments", icon: Receipt },
     { label: "License Keys & Domains", href: "/control/licenses", icon: Key },
     { label: "Customization Quotes", href: "/control/quotes", icon: FileText },
     { label: "System Broadcasts", href: "/control/broadcasts", icon: Bell },

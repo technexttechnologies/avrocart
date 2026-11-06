@@ -3,19 +3,19 @@
 import { useEffect, useState } from "react";
 import {
   Key,
-  Plus,
   Shield,
-  ShieldAlert,
-  Server,
-  Globe,
-  Clock,
   RotateCw,
+  Plus,
+  Globe,
   Copy,
   CheckCircle2,
   AlertTriangle,
   History,
   Store,
-  Link2,
+  Edit2,
+  Trash2,
+  TrendingUp,
+  Zap,
 } from "lucide-react";
 
 export default function LicensesControlPage() {
@@ -34,6 +34,20 @@ export default function LicensesControlPage() {
   // Rebind domain modal
   const [rebindTarget, setRebindTarget] = useState<any | null>(null);
   const [rebindDomain, setRebindDomain] = useState("");
+
+  // Edit License State
+  const [editTarget, setEditTarget] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState({
+    customerId: "",
+    planTier: "GROW",
+    status: "ACTIVE",
+    boundDomain: "",
+    expiresAt: "",
+    licenseKey: "",
+  });
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editSuccess, setEditSuccess] = useState<string | null>(null);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   // Connect to Store State
   const [connectStoreTarget, setConnectStoreTarget] = useState<any | null>(null);
@@ -86,7 +100,7 @@ export default function LicensesControlPage() {
           setLicenses(res.licenses);
           setLogs(res.validationLogs);
           setCustomers(res.customers);
-          if (res.customers?.length > 0) {
+          if (res.customers?.length > 0 && !newLicCustomerId) {
             setNewLicCustomerId(res.customers[0].id);
           }
         }
@@ -124,6 +138,81 @@ export default function LicensesControlPage() {
     }
   };
 
+  const openEditModal = (lic: any) => {
+    setEditTarget(lic);
+    setEditForm({
+      customerId: lic.customerId || "",
+      planTier: lic.planTier || "GROW",
+      status: lic.status || "ACTIVE",
+      boundDomain: lic.boundDomain || "",
+      expiresAt: lic.expiresAt ? new Date(lic.expiresAt).toISOString().split("T")[0] : "",
+      licenseKey: lic.licenseKey || "",
+    });
+    setEditError(null);
+    setEditSuccess(null);
+  };
+
+  const handleSaveLicenseEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editTarget) return;
+
+    setIsSavingEdit(true);
+    setEditError(null);
+    setEditSuccess(null);
+
+    try {
+      const res = await fetch("/api/v1/control/licenses", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editTarget.id,
+          action: "EDIT",
+          customerId: editForm.customerId,
+          planTier: editForm.planTier,
+          status: editForm.status,
+          boundDomain: editForm.boundDomain,
+          expiresAt: editForm.expiresAt ? new Date(editForm.expiresAt).toISOString() : undefined,
+          licenseKey: editForm.licenseKey,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setEditError(data.error || "Failed to update license.");
+      } else {
+        setEditSuccess("License details & plan tier updated successfully!");
+        loadData();
+        setTimeout(() => {
+          setEditTarget(null);
+        }, 1200);
+      }
+    } catch (err: any) {
+      setEditError(err.message || "Network error updating license.");
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
+  const handleDeleteLicense = async (id: string, key: string) => {
+    if (!confirm(`Are you sure you want to permanently delete license key '${key}'? This will disconnect the store.`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/v1/control/licenses?id=${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setEditTarget(null);
+        loadData();
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to delete license.");
+      }
+    } catch (err: any) {
+      alert(`Error deleting license: ${err.message}`);
+    }
+  };
+
   const handleRebindDomain = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rebindTarget) return;
@@ -144,7 +233,7 @@ export default function LicensesControlPage() {
         <div>
           <h1 className="text-2xl font-extrabold text-[#0A192F]">Cryptographic License Management</h1>
           <p className="text-xs text-slate-500 mt-1">
-            Generate, validate, bind domains, and monitor heartbeats for customer-deployed AVRO stores.
+            Generate, edit, upgrade plans, bind domains, and monitor heartbeats for customer-deployed AVRO stores.
           </p>
         </div>
         <button
@@ -162,11 +251,11 @@ export default function LicensesControlPage() {
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase">
-                <th className="py-3.5 px-4">Master License Key</th>
-                <th className="py-3.5 px-4">Licensee / Customer</th>
+                <th className="py-3.5 px-4">License Key</th>
+                <th className="py-3.5 px-4">Customer</th>
                 <th className="py-3.5 px-4">Plan Tier</th>
                 <th className="py-3.5 px-4">Bound Domain</th>
-                <th className="py-3.5 px-4">Expires On</th>
+                <th className="py-3.5 px-4">Expiry Date</th>
                 <th className="py-3.5 px-4">Last Heartbeat</th>
                 <th className="py-3.5 px-4">Status</th>
                 <th className="py-3.5 px-4 text-right">Actions</th>
@@ -175,28 +264,24 @@ export default function LicensesControlPage() {
             <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-8 text-slate-400">
-                    Loading license registry...
-                  </td>
+                  <td colSpan={8} className="text-center py-8 text-slate-400">Loading licenses...</td>
                 </tr>
               ) : licenses.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-8 text-slate-400">
-                    No issued licenses found.
-                  </td>
+                  <td colSpan={8} className="text-center py-8 text-slate-400">No licenses minted yet.</td>
                 </tr>
               ) : (
                 licenses.map((lic) => (
                   <tr key={lic.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2">
-                        <code className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded select-all">
+                        <code className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-1 rounded">
                           {lic.licenseKey}
                         </code>
                         <button
                           onClick={() => copyText(lic.licenseKey)}
-                          title="Copy license key"
-                          className="text-slate-400 hover:text-slate-600"
+                          className="text-slate-400 hover:text-slate-600 p-0.5"
+                          title="Copy key"
                         >
                           {copiedKey === lic.licenseKey ? (
                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
@@ -245,21 +330,15 @@ export default function LicensesControlPage() {
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-right space-x-1 whitespace-nowrap">
-                      {lic.status === "ACTIVE" ? (
-                        <button
-                          onClick={() => handleAction(lic.id, "SUSPEND")}
-                          className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 hover:bg-amber-100 font-semibold"
-                        >
-                          Suspend
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleAction(lic.id, "ACTIVATE")}
-                          className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold"
-                        >
-                          Activate
-                        </button>
-                      )}
+                      <button
+                        onClick={() => openEditModal(lic)}
+                        className="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-[#2563EB] font-bold inline-flex items-center gap-1"
+                        title="Edit license, upgrade plan, change customer, or domain"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                        Edit
+                      </button>
+
                       <button
                         onClick={() => {
                           setConnectStoreTarget(lic);
@@ -267,25 +346,37 @@ export default function LicensesControlPage() {
                           setConnectSuccessMsg(null);
                           setConnectErrorMsg(null);
                         }}
-                        className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold border border-emerald-200"
+                        className="px-2 py-1 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold border border-emerald-200 inline-flex items-center gap-1"
                         title="Connect this license directly to a remote store URL"
                       >
-                        Connect Store
+                        <Store className="w-3 h-3" />
+                        Connect
                       </button>
+
+                      {lic.status === "ACTIVE" ? (
+                        <button
+                          onClick={() => handleAction(lic.id, "SUSPEND")}
+                          className="px-2 py-1 rounded bg-amber-50 text-amber-700 hover:bg-amber-100 font-semibold"
+                        >
+                          Suspend
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleAction(lic.id, "ACTIVATE")}
+                          className="px-2 py-1 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold"
+                        >
+                          Activate
+                        </button>
+                      )}
+
                       <button
                         onClick={() => {
                           setRebindTarget(lic);
                           setRebindDomain(lic.boundDomain || "");
                         }}
-                        className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold"
+                        className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold"
                       >
-                        Rebind Domain
-                      </button>
-                      <button
-                        onClick={() => handleAction(lic.id, "EXTEND", { extendDays: 30 })}
-                        className="px-2 py-0.5 rounded bg-blue-50 text-[#2563EB] hover:bg-blue-100 font-semibold"
-                      >
-                        +30 Days
+                        Rebind
                       </button>
                     </td>
                   </tr>
@@ -347,6 +438,173 @@ export default function LicensesControlPage() {
           </table>
         </div>
       </div>
+
+      {/* EDIT LICENSE MODAL */}
+      {editTarget && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-slate-200 max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold">
+                  <Edit2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">Edit License & Upgrade Plan</h3>
+                  <p className="text-xs text-slate-400">Modify plan tier, domain binding, customer assignment, or validity.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditTarget(null)}
+                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400"
+              >
+                ✕
+              </button>
+            </div>
+
+            {editSuccess && (
+              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{editSuccess}</span>
+              </div>
+            )}
+
+            {editError && (
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>{editError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSaveLicenseEdit} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">License Key</label>
+                <input
+                  type="text"
+                  required
+                  value={editForm.licenseKey}
+                  onChange={(e) => setEditForm({ ...editForm, licenseKey: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Assigned Customer Account</label>
+                  <select
+                    value={editForm.customerId}
+                    onChange={(e) => setEditForm({ ...editForm, customerId: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  >
+                    {customers.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} ({c.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1 flex items-center justify-between">
+                    <span>Plan Entitlement Tier</span>
+                    <span className="text-[10px] text-blue-600 font-bold uppercase">Upgrade Option</span>
+                  </label>
+                  <select
+                    value={editForm.planTier}
+                    onChange={(e) => setEditForm({ ...editForm, planTier: e.target.value })}
+                    className="w-full px-3 py-2 border border-blue-300 bg-blue-50/50 rounded-xl font-bold text-[#2563EB] focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  >
+                    <option value="BASIC">AVRO Basic Tier</option>
+                    <option value="GROW">AVRO Grow Tier</option>
+                    <option value="PLUS">AVRO Plus Tier (All Gateways & Couriers)</option>
+                    <option value="ENTERPRISE">AVRO Enterprise Tier</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">License Status</label>
+                  <select
+                    value={editForm.status}
+                    onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  >
+                    <option value="ACTIVE">ACTIVE (Authorized & Unlocked)</option>
+                    <option value="SUSPENDED">SUSPENDED (Grace / Warning)</option>
+                    <option value="REVOKED">REVOKED (Store Locked)</option>
+                    <option value="EXPIRED">EXPIRED (Renewal Due)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Expiration Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={editForm.expiresAt}
+                    onChange={(e) => setEditForm({ ...editForm, expiresAt: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Authorized Bound Domain</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={editForm.boundDomain}
+                    onChange={(e) => setEditForm({ ...editForm, boundDomain: e.target.value })}
+                    placeholder="e.g. store.clientbrand.com or localhost:3001"
+                    className="flex-1 px-3 py-2 border border-slate-300 rounded-xl font-mono text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setEditForm({ ...editForm, boundDomain: "" })}
+                    className="px-2.5 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold text-[11px]"
+                  >
+                    Clear Binding
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditForm({ ...editForm, boundDomain: "localhost:3001" })}
+                    className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px]"
+                  >
+                    Local 3001
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => handleDeleteLicense(editTarget.id, editTarget.licenseKey)}
+                  className="text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1 hover:underline"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Delete License
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditTarget(null)}
+                    className="px-3.5 py-2 rounded-xl border border-slate-300 font-bold text-slate-700 hover:bg-slate-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingEdit}
+                    className="px-5 py-2 rounded-xl bg-[#0A192F] hover:bg-[#1E293B] text-white font-bold transition shadow-sm"
+                  >
+                    {isSavingEdit ? "Saving..." : "Save License Changes"}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Generate License Modal */}
       {isGenerateModalOpen && (
@@ -465,6 +723,7 @@ export default function LicensesControlPage() {
           </div>
         </div>
       )}
+
       {/* Connect to Store Modal */}
       {connectStoreTarget && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
@@ -549,8 +808,7 @@ export default function LicensesControlPage() {
                   disabled={isConnectingStore}
                   className="px-5 py-2 rounded-xl bg-[#0A192F] hover:bg-[#1E293B] text-white font-bold transition flex items-center gap-2 shadow-sm"
                 >
-                  <Link2 className="w-3.5 h-3.5" />
-                  <span>{isConnectingStore ? "Connecting Store..." : "Deploy License to Store"}</span>
+                  {isConnectingStore ? "Deploying..." : "Deploy License Key"}
                 </button>
               </div>
             </form>

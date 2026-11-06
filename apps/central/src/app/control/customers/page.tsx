@@ -13,6 +13,12 @@ import {
   CheckCircle2,
   XCircle,
   FileText,
+  Trash2,
+  Lock,
+  Building,
+  Phone,
+  Mail,
+  AlertTriangle,
 } from "lucide-react";
 
 export default function CustomersControlPage() {
@@ -21,6 +27,21 @@ export default function CustomersControlPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCustomer, setSelectedCustomer] = useState<any | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  // Edit Customer State
+  const [editCustomer, setEditCustomer] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    email: "",
+    companyName: "",
+    phone: "",
+    status: "ACTIVE",
+    password: "",
+    internalNotes: "",
+  });
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editSuccess, setEditSuccess] = useState<string | null>(null);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   // New customer form
   const [newCustomer, setNewCustomer] = useState({
@@ -58,6 +79,86 @@ export default function CustomersControlPage() {
       setIsAddModalOpen(false);
       setNewCustomer({ name: "", email: "", companyName: "", phone: "", internalNotes: "" });
       fetchCustomers();
+    }
+  };
+
+  const openEditModal = (c: any) => {
+    setEditCustomer(c);
+    setEditForm({
+      name: c.name || "",
+      email: c.email || "",
+      companyName: c.companyName || "",
+      phone: c.phone || "",
+      status: c.status || "ACTIVE",
+      password: "",
+      internalNotes: c.internalNotes || "",
+    });
+    setEditError(null);
+    setEditSuccess(null);
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editCustomer) return;
+    setIsSavingEdit(true);
+    setEditError(null);
+    setEditSuccess(null);
+
+    try {
+      const payload: any = {
+        id: editCustomer.id,
+        name: editForm.name,
+        email: editForm.email,
+        companyName: editForm.companyName,
+        phone: editForm.phone,
+        status: editForm.status,
+        internalNotes: editForm.internalNotes,
+      };
+      if (editForm.password.trim()) {
+        payload.password = editForm.password.trim();
+      }
+
+      const res = await fetch("/api/v1/control/customers", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setEditError(data.error || "Failed to update customer account.");
+      } else {
+        setEditSuccess("Customer account updated successfully!");
+        fetchCustomers();
+        setTimeout(() => {
+          setEditCustomer(null);
+        }, 1200);
+      }
+    } catch (err: any) {
+      setEditError(err.message || "Network error updating customer.");
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
+  const handleDeleteCustomer = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to permanently delete customer '${name}' and all associated subscriptions and licenses?`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/v1/control/customers?id=${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setEditCustomer(null);
+        setSelectedCustomer(null);
+        fetchCustomers();
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to delete customer.");
+      }
+    } catch (err: any) {
+      alert(`Error deleting customer: ${err.message}`);
     }
   };
 
@@ -197,16 +298,23 @@ export default function CustomersControlPage() {
                           {c.status}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-right space-x-2">
+                      <td className="py-3.5 px-4 text-right space-x-1.5 whitespace-nowrap">
+                        <button
+                          onClick={() => openEditModal(c)}
+                          className="px-2.5 py-1 rounded bg-blue-50 hover:bg-blue-100 text-[#2563EB] font-bold inline-flex items-center gap-1"
+                        >
+                          <Edit2 className="w-3 h-3" />
+                          Edit
+                        </button>
                         <button
                           onClick={() => setSelectedCustomer(c)}
                           className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold"
                         >
-                          View Details
+                          View
                         </button>
                         <button
                           onClick={() => handleToggleStatus(c)}
-                          className={`px-2.5 py-1 rounded font-semibold ${
+                          className={`px-2 py-1 rounded font-semibold ${
                             c.status === "ACTIVE"
                               ? "bg-rose-50 text-rose-700 hover:bg-rose-100"
                               : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
@@ -224,6 +332,157 @@ export default function CustomersControlPage() {
         </div>
       </div>
 
+      {/* Edit Customer Modal */}
+      {editCustomer && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-slate-200 max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold">
+                  <Edit2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">Edit Customer Account</h3>
+                  <p className="text-xs text-slate-400">Update account credentials, profile, and authorization status.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditCustomer(null)}
+                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400"
+              >
+                ✕
+              </button>
+            </div>
+
+            {editSuccess && (
+              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{editSuccess}</span>
+              </div>
+            )}
+
+            {editError && (
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>{editError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSaveEdit} className="space-y-3.5 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editForm.name}
+                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    value={editForm.email}
+                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Company / Brand</label>
+                  <input
+                    type="text"
+                    value={editForm.companyName}
+                    onChange={(e) => setEditForm({ ...editForm, companyName: e.target.value })}
+                    placeholder="e.g. Apex Retail Solutions"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Phone Number</label>
+                  <input
+                    type="text"
+                    value={editForm.phone}
+                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                    placeholder="e.g. +91 98765 43210"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Account Status</label>
+                  <select
+                    value={editForm.status}
+                    onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  >
+                    <option value="ACTIVE">ACTIVE (Authorized)</option>
+                    <option value="SUSPENDED">SUSPENDED (Locked)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Reset Password <span className="text-slate-400 font-normal">(Leave blank to keep)</span>
+                  </label>
+                  <input
+                    type="password"
+                    value={editForm.password}
+                    onChange={(e) => setEditForm({ ...editForm, password: e.target.value })}
+                    placeholder="••••••••"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Internal Confidential Notes</label>
+                <textarea
+                  rows={2}
+                  value={editForm.internalNotes}
+                  onChange={(e) => setEditForm({ ...editForm, internalNotes: e.target.value })}
+                  placeholder="Notes about custom terms, VIP merchant status, or SLAs..."
+                  className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => handleDeleteCustomer(editCustomer.id, editCustomer.name)}
+                  className="text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1 hover:underline"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Delete Customer
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditCustomer(null)}
+                    className="px-3.5 py-2 rounded-xl border border-slate-300 font-bold text-slate-700 hover:bg-slate-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingEdit}
+                    className="px-5 py-2 rounded-xl bg-[#0A192F] hover:bg-[#1E293B] text-white font-bold transition shadow-sm"
+                  >
+                    {isSavingEdit ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Customer Detail Drawer Modal */}
       {selectedCustomer && (
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
@@ -233,12 +492,25 @@ export default function CustomersControlPage() {
                 <h3 className="text-lg font-bold text-[#0A192F]">{selectedCustomer.name}</h3>
                 <p className="text-xs text-slate-400">{selectedCustomer.email}</p>
               </div>
-              <button
-                onClick={() => setSelectedCustomer(null)}
-                className="text-slate-400 hover:text-slate-600 font-bold"
-              >
-                ✕
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const c = selectedCustomer;
+                    setSelectedCustomer(null);
+                    openEditModal(c);
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-blue-50 text-[#2563EB] hover:bg-blue-100 font-bold text-xs flex items-center gap-1.5"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                  Edit Account
+                </button>
+                <button
+                  onClick={() => setSelectedCustomer(null)}
+                  className="text-slate-400 hover:text-slate-600 font-bold p-1"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-xs">

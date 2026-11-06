@@ -59,14 +59,21 @@ export async function POST(req: NextRequest) {
     // Fallback seed admin check for immediate accessibility
     if (!admin && cleanEmail === "admin@technext.co") {
       const hash = await bcrypt.hash("admin123", 10);
-      admin = await prisma.adminUser.create({
-        data: {
-          name: "Technext Master Admin",
-          email: "admin@technext.co",
-          passwordHash: hash,
-          role: "SUPER_ADMIN",
-        },
-      });
+      try {
+        admin = await prisma.adminUser.create({
+          data: {
+            name: "Technext Master Admin",
+            email: "admin@technext.co",
+            passwordHash: hash,
+            role: "SUPER_ADMIN",
+          },
+        });
+      } catch (seedErr: any) {
+        console.warn("Seed admin creation encountered:", seedErr?.message);
+        admin = await prisma.adminUser.findUnique({
+          where: { email: cleanEmail },
+        });
+      }
     }
 
     if (!admin) {
@@ -81,16 +88,20 @@ export async function POST(req: NextRequest) {
     const passwordValid = await bcrypt.compare(password, admin.passwordHash);
     if (!passwordValid) {
       const attemptsLeft = handleFailedAttempt(rateKey);
-      await prisma.adminAuditLog.create({
-        data: {
-          adminEmail: cleanEmail,
-          action: "ADMIN_LOGIN_FAILED",
-          target: "Central Control Portal",
-          details: `Failed password attempt from IP ${ip}. ${attemptsLeft} attempt(s) remaining.`,
-          ipAddress: ip,
-          severity: "WARNING",
-        },
-      });
+      try {
+        await prisma.adminAuditLog.create({
+          data: {
+            adminEmail: cleanEmail,
+            action: "ADMIN_LOGIN_FAILED",
+            target: "Central Control Portal",
+            details: `Failed password attempt from IP ${ip}. ${attemptsLeft} attempt(s) remaining.`,
+            ipAddress: ip,
+            severity: "WARNING",
+          },
+        });
+      } catch (auditErr) {
+        console.warn("Failed to write audit log for failed attempt:", auditErr);
+      }
 
       return NextResponse.json(
         {
@@ -143,17 +154,21 @@ export async function POST(req: NextRequest) {
       { expiresIn: "12h" }
     );
 
-    // 8. Log Audit Trail
-    await prisma.adminAuditLog.create({
-      data: {
-        adminEmail: admin.email,
-        action: "ADMIN_LOGIN_SUCCESS",
-        target: "Central Control Portal",
-        details: `Successful 2FA authenticated session established from ${ip}`,
-        ipAddress: ip,
-        severity: "NORMAL",
-      },
-    });
+    // 8. Log Audit Trail (non-fatal)
+    try {
+      await prisma.adminAuditLog.create({
+        data: {
+          adminEmail: admin.email,
+          action: "ADMIN_LOGIN_SUCCESS",
+          target: "Central Control Portal",
+          details: `Successful 2FA authenticated session established from ${ip}`,
+          ipAddress: ip,
+          severity: "NORMAL",
+        },
+      });
+    } catch (auditErr) {
+      console.warn("Non-fatal: Failed to write success audit log:", auditErr);
+    }
 
     const response = NextResponse.json({
       success: true,
@@ -179,7 +194,13 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (err: any) {
     console.error("Central login error:", err);
-    return NextResponse.json({ success: false, error: "Internal authentication error." }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: err?.message ? `Authentication error: ${err.message}` : "Internal authentication error.",
+      },
+      { status: 500 }
+    );
   }
 }
 

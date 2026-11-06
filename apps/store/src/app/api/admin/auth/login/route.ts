@@ -59,14 +59,21 @@ export async function POST(req: NextRequest) {
     // Auto-seed default store owner if missing
     if (!admin && cleanEmail === "storeadmin@example.com") {
       const hash = await bcrypt.hash("storeadmin123", 10);
-      admin = await prisma.storeAdmin.create({
-        data: {
-          name: "Store Administrator",
-          email: "storeadmin@example.com",
-          passwordHash: hash,
-          role: "OWNER",
-        },
-      });
+      try {
+        admin = await prisma.storeAdmin.create({
+          data: {
+            name: "Store Administrator",
+            email: "storeadmin@example.com",
+            passwordHash: hash,
+            role: "OWNER",
+          },
+        });
+      } catch (seedErr: any) {
+        console.warn("Store seed admin creation encountered:", seedErr?.message);
+        admin = await prisma.storeAdmin.findUnique({
+          where: { email: cleanEmail },
+        });
+      }
     }
 
     if (!admin) {
@@ -159,7 +166,13 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (err: any) {
     console.error("Store admin login error:", err);
-    return NextResponse.json({ success: false, error: "Internal authentication error." }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: err?.message ? `Authentication error: ${err.message}` : "Internal authentication error.",
+      },
+      { status: 500 }
+    );
   }
 }
 

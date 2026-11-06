@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const schemaPath = path.join(__dirname, "../prisma/schema.prisma");
+const envPath = path.join(__dirname, "../.env");
 
 if (!fs.existsSync(schemaPath)) {
   console.log("[prepare-prisma] schema.prisma not found at", schemaPath);
@@ -61,7 +62,22 @@ if (
 ) {
   console.log(`[prepare-prisma] Detected PostgreSQL (Supabase/Neon). Binding url = env("${urlEnvVar}")`);
   schema = schema.replace(/provider\s*=\s*"sqlite"/g, 'provider = "postgresql"');
-  
+
+  // Enforce schema=store
+  if (dbUrl && !dbUrl.includes("schema=")) {
+    dbUrl += (dbUrl.includes("?") ? "&" : "?") + "schema=store";
+    process.env[urlEnvVar] = dbUrl;
+    process.env.DATABASE_URL = dbUrl;
+    console.log("[prepare-prisma] Appended schema=store to Store DB URL");
+  }
+
+  if (directUrl && !directUrl.includes("schema=")) {
+    directUrl += (directUrl.includes("?") ? "&" : "?") + "schema=store";
+    process.env[directEnvVar] = directUrl;
+    process.env.DIRECT_URL = directUrl;
+    console.log("[prepare-prisma] Appended schema=store to Store DIRECT_URL");
+  }
+
   if (urlEnvVar !== "DATABASE_URL") {
     schema = schema.replace(/env\("DATABASE_URL"\)/g, `env("${urlEnvVar}")`);
   }
@@ -71,6 +87,28 @@ if (
       new RegExp(`url\\s*=\\s*env\\("${urlEnvVar}"\\)`, "g"),
       `url       = env("${urlEnvVar}")\n  directUrl = env("${directEnvVar}")`
     );
+  }
+
+  // Update .env file if it exists so Next.js build workers inherit it
+  try {
+    let envContent = fs.existsSync(envPath) ? fs.readFileSync(envPath, "utf8") : "";
+    if (dbUrl && !envContent.includes(dbUrl)) {
+      if (/^DATABASE_URL=.*/m.test(envContent)) {
+        envContent = envContent.replace(/^DATABASE_URL=.*/m, `DATABASE_URL="${dbUrl}"`);
+      } else {
+        envContent += `\nDATABASE_URL="${dbUrl}"\n`;
+      }
+      if (directUrl) {
+        if (/^DIRECT_URL=.*/m.test(envContent)) {
+          envContent = envContent.replace(/^DIRECT_URL=.*/m, `DIRECT_URL="${directUrl}"`);
+        } else {
+          envContent += `\nDIRECT_URL="${directUrl}"\n`;
+        }
+      }
+      fs.writeFileSync(envPath, envContent.trim() + "\n");
+    }
+  } catch (e) {
+    console.warn("[prepare-prisma] Could not write to .env:", e.message);
   }
 } else if (dbUrl.startsWith("file:") || (!dbUrl && !process.env.VERCEL)) {
   console.log('[prepare-prisma] Detected SQLite/local DATABASE_URL. Ensuring provider = "sqlite" in schema.prisma');

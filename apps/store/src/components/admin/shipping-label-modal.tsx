@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Printer, X, Download, ShieldCheck, Check, Package, QrCode } from "lucide-react";
 
 export interface ShippingLabelOrder {
@@ -32,11 +32,32 @@ interface ShippingLabelModalProps {
 }
 
 export default function ShippingLabelModal({ orders, onClose }: ShippingLabelModalProps) {
+  const [storeSettings, setStoreSettings] = useState<any>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/settings/general")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.settings) {
+          setStoreSettings(data.settings);
+        }
+      })
+      .catch((e) => console.error("Could not load store settings for label:", e));
+  }, []);
+
   if (!orders || orders.length === 0) return null;
 
   const handlePrint = () => {
     window.print();
   };
+
+  const brandName = storeSettings?.brandName || "AVRO OFFICIAL STORE";
+  const sellerAddress = storeSettings?.companyAddress || "Technext Logistics Hub, Sector 62";
+  const sellerCity = storeSettings?.companyCity || "Noida";
+  const sellerState = storeSettings?.companyState || "Uttar Pradesh";
+  const sellerPostalCode = storeSettings?.companyPostalCode || "201309";
+  const sellerPhone = storeSettings?.supportPhone || "+91 98765 43210";
+  const sellerGstin = storeSettings?.taxId || "07AAACT9021M1Z4";
 
   // Helper to parse address
   const parseAddress = (order: ShippingLabelOrder) => {
@@ -45,21 +66,19 @@ export default function ShippingLabelModal({ orders, onClose }: ShippingLabelMod
         const parsed = JSON.parse(order.shippingAddressJson);
         return {
           fullName: parsed.fullName || order.customerName,
-          addressLine1: parsed.addressLine1 || "Plot 42, Commercial Avenue",
+          addressLine1: parsed.addressLine1 || "Customer Address Line",
           addressLine2: parsed.addressLine2 || "",
           city: parsed.city || "New Delhi",
           state: parsed.state || "Delhi",
           postalCode: parsed.postalCode || "110001",
           phone: parsed.phone || order.customerPhone || "+91 98765 43210",
         };
-      } catch (e) {
-        // fallback
-      }
+      } catch (e) {}
     }
     return {
       fullName: order.customerName,
       addressLine1: "Suite 302, Cyber Tower",
-      addressLine2: "Phase 2, Indiranagar",
+      addressLine2: "Phase 2",
       city: "Bengaluru",
       state: "Karnataka",
       postalCode: "560038",
@@ -97,8 +116,8 @@ export default function ShippingLabelModal({ orders, onClose }: ShippingLabelMod
   return (
     <>
       {/* On-Screen Modal Overlay */}
-      <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto no-print">
-        <div className="bg-white rounded-3xl border border-slate-200 max-w-4xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-3 md:p-6 overflow-y-auto no-print">
+        <div className="bg-white rounded-3xl border border-slate-200 max-w-4xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
           {/* Modal Header */}
           <div className="px-6 py-4 bg-[#0A192F] text-white flex items-center justify-between border-b border-slate-800 flex-shrink-0">
             <div className="flex items-center gap-3">
@@ -107,10 +126,10 @@ export default function ShippingLabelModal({ orders, onClose }: ShippingLabelMod
               </div>
               <div>
                 <h3 className="text-base font-extrabold tracking-tight">
-                  E-Commerce Thermal Shipping Labels (4" × 6")
+                  Thermal Dispatch Labels (4" × 6")
                 </h3>
                 <p className="text-xs text-slate-300">
-                  {orders.length} label{orders.length > 1 ? "s" : ""} prepared for thermal or laser dispatch printing
+                  {orders.length} shipment{orders.length > 1 ? "s" : ""} · Minimalist courier standard (100mm × 150mm)
                 </p>
               </div>
             </div>
@@ -136,12 +155,12 @@ export default function ShippingLabelModal({ orders, onClose }: ShippingLabelMod
           </div>
 
           {/* Modal Content - Scrollable Preview */}
-          <div className="flex-1 overflow-y-auto p-6 bg-slate-100 flex flex-col items-center gap-8">
-            <div className="w-full max-w-[420px] text-center text-xs text-slate-500 bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-              <span className="font-semibold text-slate-700">Printing Tip:</span> Compatible with TSC, Zebra, Rollo & standard thermal printers (4"x6" / 100mm×150mm) or A4 sheets.
+          <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-100 flex flex-col items-center gap-6">
+            <div className="w-full max-w-[420px] text-center text-xs text-slate-500 bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
+              <span className="font-bold text-slate-700">Printing Note:</span> Standard 4"×6" thermal label roll (100mm×150mm) or A4 sticker sheets.
             </div>
 
-            {orders.map((order, idx) => {
+            {orders.map((order) => {
               const address = parseAddress(order);
               const { courier, tracking, routingCode } = getCourierDetails(order);
               const isCOD = order.paymentMethod === "COD" || order.paymentStatus !== "PAID";
@@ -149,27 +168,27 @@ export default function ShippingLabelModal({ orders, onClose }: ShippingLabelMod
               return (
                 <div
                   key={order.id}
-                  className="bg-white w-full max-w-[420px] border-2 border-black rounded-lg shadow-lg overflow-hidden font-mono text-black text-[11px] leading-tight"
-                  style={{ minHeight: "600px" }}
+                  className="bg-white w-full max-w-[420px] border border-black rounded-lg shadow-lg overflow-hidden font-mono text-black text-[11px] leading-tight"
+                  style={{ minHeight: "580px" }}
                 >
                   {/* Courier & Routing Header */}
-                  <div className="p-3 border-b-2 border-black flex items-center justify-between">
+                  <div className="p-3 border-b border-black flex items-center justify-between">
                     <div>
-                      <span className="text-[14px] font-black tracking-tight block uppercase">
+                      <span className="text-[13px] font-black tracking-tight block uppercase">
                         {courier === "DELHIVERY"
-                          ? "DELHIVERY EXPRESS"
+                          ? "DELHIVERY SURFACE"
                           : courier === "SHIPROCKET"
                           ? "SHIPROCKET AIR"
                           : courier === "DTDC"
-                          ? "DTDC PLUS"
+                          ? "DTDC PRIORITY"
                           : "BLUE DART APEX"}
                       </span>
-                      <span className="text-[9px] font-bold text-slate-700">
-                        STANDARD SURFACE & AIR LOGISTICS
+                      <span className="text-[9px] font-bold text-slate-600">
+                        EXPRESS PARCEL DISPATCH
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[12px] font-black border-2 border-black px-1.5 py-0.5 rounded uppercase">
+                      <span className="text-[11px] font-black border border-black px-1.5 py-0.5 rounded uppercase">
                         {routingCode}
                       </span>
                       <span className="text-[9px] block text-slate-600 mt-0.5">
@@ -182,15 +201,14 @@ export default function ShippingLabelModal({ orders, onClose }: ShippingLabelMod
                     </div>
                   </div>
 
-                  {/* High-Resolution Simulated Barcode */}
-                  <div className="p-3 border-b-2 border-black text-center bg-white space-y-1">
+                  {/* High-Resolution Code 128 Barcode & QR */}
+                  <div className="p-3 border-b border-black text-center bg-white space-y-1">
                     <div className="flex items-center justify-center gap-2">
                       <svg
-                        className="w-full h-12"
+                        className="w-full h-11"
                         viewBox="0 0 300 48"
                         preserveAspectRatio="none"
                       >
-                        {/* Realistic Code 128 vertical bar pattern */}
                         <g fill="black">
                           <rect x="0" y="0" width="3" height="48" />
                           <rect x="5" y="0" width="2" height="48" />
@@ -244,97 +262,95 @@ export default function ShippingLabelModal({ orders, onClose }: ShippingLabelMod
                         </g>
                       </svg>
 
-                      {/* QR matrix placeholder */}
-                      <div className="w-12 h-12 border-2 border-black p-0.5 flex-shrink-0 flex items-center justify-center">
-                        <QrCode className="w-10 h-10 text-black" />
+                      <div className="w-11 h-11 border border-black p-0.5 flex-shrink-0 flex items-center justify-center">
+                        <QrCode className="w-9 h-9 text-black" />
                       </div>
                     </div>
-                    <span className="text-[12px] font-black tracking-widest block uppercase mt-1">
+                    <span className="text-[11px] font-black tracking-widest block uppercase mt-0.5">
                       AWB: {tracking}
                     </span>
                   </div>
 
-                  {/* Payment Type Banner */}
+                  {/* Payment Type Strip */}
                   <div
-                    className={`p-2 border-b-2 border-black text-center font-black uppercase text-[12px] tracking-wider ${
-                      isCOD ? "bg-black text-white" : "bg-white text-black"
+                    className={`p-1.5 border-b border-black text-center font-black uppercase text-[11px] tracking-wider ${
+                      isCOD ? "bg-black text-white" : "bg-slate-100 text-black"
                     }`}
                   >
                     {isCOD
-                      ? `CASH ON DELIVERY (COD) — COLLECT ₹${order.total.toLocaleString("en-IN")}`
-                      : "★ PREPAID SHIPMENT — DO NOT COLLECT CASH ★"}
+                      ? `CASH ON DELIVERY (COD): COLLECT ₹${order.total.toLocaleString("en-IN")}`
+                      : "PREPAID SHIPMENT — DO NOT COLLECT CASH"}
                   </div>
 
                   {/* Consignee / Ship-To Details */}
-                  <div className="p-3 border-b-2 border-black space-y-1">
-                    <span className="text-[9px] font-extrabold uppercase tracking-wider block text-slate-600">
+                  <div className="p-3 border-b border-black space-y-1">
+                    <span className="text-[8px] font-extrabold uppercase tracking-wider block text-slate-500">
                       SHIP TO (CONSIGNEE):
                     </span>
-                    <strong className="text-[14px] font-black block uppercase tracking-tight">
+                    <strong className="text-[13px] font-black block uppercase tracking-tight">
                       {address.fullName}
                     </strong>
-                    <p className="text-[11px] leading-tight font-medium">
+                    <p className="text-[10px] leading-tight font-medium">
                       {address.addressLine1}
                       {address.addressLine2 ? `, ${address.addressLine2}` : ""}
                     </p>
-                    <p className="text-[11px] leading-tight font-medium">
+                    <p className="text-[10px] leading-tight font-medium">
                       {address.city}, {address.state}
                     </p>
                     <div className="flex items-center justify-between pt-1">
-                      <span className="text-[14px] font-black tracking-wider bg-black text-white px-2 py-0.5 rounded">
+                      <span className="text-[12px] font-black tracking-wider bg-black text-white px-2 py-0.5 rounded">
                         PIN: {address.postalCode}
                       </span>
-                      <span className="text-[11px] font-bold">
+                      <span className="text-[10px] font-bold">
                         TEL: {address.phone}
                       </span>
                     </div>
                   </div>
 
-                  {/* Shipped By / Return To */}
-                  <div className="p-3 border-b-2 border-black space-y-0.5 bg-slate-50 text-[10px]">
+                  {/* Shipped By / Return To (Dynamic from Store Settings) */}
+                  <div className="p-2.5 border-b border-black space-y-0.5 bg-slate-50/50 text-[9px]">
                     <span className="text-[8px] font-extrabold uppercase tracking-wider block text-slate-500">
                       RETURN ADDRESS (SELLER):
                     </span>
-                    <strong className="text-[11px] font-black block uppercase">
-                      AVRO OFFICIAL STORE (LOGISTICS WAREHOUSE)
+                    <strong className="text-[10px] font-black block uppercase">
+                      {brandName}
                     </strong>
-                    <p>Technext Logistics Hub, Sector 62, Industrial Area</p>
-                    <p>Noida, Uttar Pradesh - 201309 | Helpline: 1800-AVRO-SHOP</p>
-                    <p className="font-bold">GSTIN: 07AAACT9021M1Z4</p>
+                    <p>{sellerAddress}, {sellerCity}, {sellerState} - {sellerPostalCode}</p>
+                    <p>Contact: {sellerPhone} | GSTIN: {sellerGstin}</p>
                   </div>
 
                   {/* Package & Product Information */}
-                  <div className="p-3 border-b-2 border-black space-y-1">
-                    <div className="grid grid-cols-3 gap-2 pb-1 border-b border-black text-[10px]">
+                  <div className="p-2.5 border-b border-black space-y-1 text-[9px]">
+                    <div className="grid grid-cols-3 gap-2 pb-1 border-b border-slate-200">
                       <div>
-                        <span className="text-slate-500 block text-[8px] uppercase">Order #</span>
-                        <strong className="font-black">{order.orderNumber}</strong>
+                        <span className="text-slate-500 block text-[8px] uppercase">Order Ref</span>
+                        <strong className="font-bold">{order.orderNumber}</strong>
                       </div>
                       <div>
-                        <span className="text-slate-500 block text-[8px] uppercase">Gross Weight</span>
-                        <strong className="font-black">0.450 KG</strong>
+                        <span className="text-slate-500 block text-[8px] uppercase">Est. Weight</span>
+                        <strong className="font-bold">0.450 KG</strong>
                       </div>
                       <div className="text-right">
-                        <span className="text-slate-500 block text-[8px] uppercase">Boxes</span>
-                        <strong className="font-black">1 of 1</strong>
+                        <span className="text-slate-500 block text-[8px] uppercase">Box Count</span>
+                        <strong className="font-bold">1 of 1</strong>
                       </div>
                     </div>
 
-                    <div className="pt-1">
+                    <div className="pt-0.5">
                       <span className="text-[8px] font-extrabold text-slate-500 uppercase block mb-0.5">
-                        PACKAGE MANIFEST ({order.items?.length || 0} ITEMS):
+                        MANIFEST ({order.items?.length || 0} ITEMS):
                       </span>
                       <div className="space-y-0.5">
                         {order.items?.slice(0, 3).map((it) => (
-                          <div key={it.id} className="flex justify-between text-[10px]">
-                            <span className="truncate max-w-[280px]">
+                          <div key={it.id} className="flex justify-between text-[9px]">
+                            <span className="truncate max-w-[260px]">
                               {it.quantity}x {it.title} {it.variantTitle ? `(${it.variantTitle})` : ""}
                             </span>
-                            <span className="font-mono text-[9px] text-slate-600">{it.sku}</span>
+                            <span className="font-mono text-[8px] text-slate-500">{it.sku}</span>
                           </div>
                         ))}
                         {(order.items?.length || 0) > 3 && (
-                          <span className="text-[9px] text-slate-500 italic block">
+                          <span className="text-[8px] text-slate-400 italic block">
                             + {(order.items?.length || 0) - 3} more line item(s)...
                           </span>
                         )}
@@ -342,14 +358,10 @@ export default function ShippingLabelModal({ orders, onClose }: ShippingLabelMod
                     </div>
                   </div>
 
-                  {/* Bottom Verification & Barcode */}
-                  <div className="p-2 text-center text-[9px] bg-white flex items-center justify-between">
-                    <span className="font-mono text-slate-500">
-                      SECURED BY AVRO DISPATCH ENGINE
-                    </span>
-                    <span className="font-bold">
-                      DELIVERY ATTEMPTS: 3
-                    </span>
+                  {/* Bottom Verification */}
+                  <div className="p-2 text-center text-[8px] bg-white flex items-center justify-between text-slate-500">
+                    <span>SECURED BY AVRO LOGISTICS CORE</span>
+                    <span className="font-bold text-black">ATTEMPTS: 3</span>
                   </div>
                 </div>
               );
@@ -359,7 +371,7 @@ export default function ShippingLabelModal({ orders, onClose }: ShippingLabelMod
           {/* Modal Footer Controls */}
           <div className="px-6 py-4 bg-white border-t border-slate-200 flex items-center justify-between flex-shrink-0">
             <span className="text-xs text-slate-500">
-              Labels will print 1 per page on thermal label rolls or standard sheet.
+              Prints 1 label per page on standard 4"×6" (100mm×150mm) thermal printers.
             </span>
             <div className="flex items-center gap-3">
               <button
@@ -382,7 +394,7 @@ export default function ShippingLabelModal({ orders, onClose }: ShippingLabelMod
         </div>
       </div>
 
-      {/* Hidden Print-Only Container (Rendered on window.print()) */}
+      {/* Hidden Print-Only Container (Pure 4"x6" Thermal Label) */}
       <div id="printable-shipping-labels" className="print-only">
         {orders.map((order) => {
           const address = parseAddress(order);
@@ -392,276 +404,146 @@ export default function ShippingLabelModal({ orders, onClose }: ShippingLabelMod
           return (
             <div
               key={order.id}
-              className="shipping-label-sheet font-mono text-black text-[11px] leading-tight"
+              className="shipping-label-sheet font-mono text-black text-[10px] leading-tight"
               style={{
                 width: "100mm",
                 minHeight: "150mm",
-                padding: "4mm",
+                padding: "3.5mm",
                 margin: "0 auto",
                 pageBreakAfter: "always",
-                border: "2px solid black",
+                border: "1px solid black",
                 boxSizing: "border-box",
+                background: "white",
               }}
             >
-              {/* Courier & Routing Header */}
+              {/* Header */}
               <div
                 style={{
-                  paddingBottom: "3mm",
-                  borderBottom: "2px solid black",
+                  paddingBottom: "2.5mm",
+                  borderBottom: "1px solid black",
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
                 }}
               >
                 <div>
-                  <span
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: "900",
-                      display: "block",
-                      textTransform: "uppercase",
-                    }}
-                  >
+                  <span style={{ fontSize: "12px", fontWeight: "900", display: "block", textTransform: "uppercase" }}>
                     {courier === "DELHIVERY"
-                      ? "DELHIVERY EXPRESS"
+                      ? "DELHIVERY SURFACE"
                       : courier === "SHIPROCKET"
                       ? "SHIPROCKET AIR"
                       : courier === "DTDC"
-                      ? "DTDC PLUS"
+                      ? "DTDC PRIORITY"
                       : "BLUE DART APEX"}
                   </span>
-                  <span style={{ fontSize: "9px", fontWeight: "700" }}>
-                    STANDARD SURFACE & AIR LOGISTICS
-                  </span>
+                  <span style={{ fontSize: "8px", fontWeight: "700" }}>EXPRESS DISPATCH</span>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <span
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: "900",
-                      border: "2px solid black",
-                      padding: "2px 4px",
-                      display: "inline-block",
-                      textTransform: "uppercase",
-                    }}
-                  >
+                  <span style={{ fontSize: "10px", fontWeight: "900", border: "1px solid black", padding: "1px 4px" }}>
                     {routingCode}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "9px",
-                      display: "block",
-                      marginTop: "2px",
-                    }}
-                  >
-                    {new Date(order.createdAt).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
                   </span>
                 </div>
               </div>
 
-              {/* Barcode */}
-              <div
-                style={{
-                  padding: "3mm 0",
-                  borderBottom: "2px solid black",
-                  textAlign: "center",
-                }}
-              >
-                <svg
-                  style={{ width: "90%", height: "42px", margin: "0 auto" }}
-                  viewBox="0 0 300 48"
-                  preserveAspectRatio="none"
-                >
-                  <g fill="black">
-                    <rect x="0" y="0" width="3" height="48" />
-                    <rect x="5" y="0" width="2" height="48" />
-                    <rect x="10" y="0" width="4" height="48" />
-                    <rect x="16" y="0" width="1" height="48" />
-                    <rect x="20" y="0" width="5" height="48" />
-                    <rect x="28" y="0" width="2" height="48" />
-                    <rect x="33" y="0" width="3" height="48" />
-                    <rect x="38" y="0" width="4" height="48" />
-                    <rect x="45" y="0" width="2" height="48" />
-                    <rect x="50" y="0" width="5" height="48" />
-                    <rect x="58" y="0" width="2" height="48" />
-                    <rect x="63" y="0" width="4" height="48" />
-                    <rect x="70" y="0" width="3" height="48" />
-                    <rect x="75" y="0" width="1" height="48" />
-                    <rect x="80" y="0" width="6" height="48" />
-                    <rect x="89" y="0" width="2" height="48" />
-                    <rect x="94" y="0" width="4" height="48" />
-                    <rect x="101" y="0" width="3" height="48" />
-                    <rect x="107" y="0" width="5" height="48" />
-                    <rect x="115" y="0" width="2" height="48" />
-                    <rect x="120" y="0" width="4" height="48" />
-                    <rect x="127" y="0" width="1" height="48" />
-                    <rect x="131" y="0" width="6" height="48" />
-                    <rect x="140" y="0" width="3" height="48" />
-                    <rect x="146" y="0" width="2" height="48" />
-                    <rect x="151" y="0" width="5" height="48" />
-                    <rect x="159" y="0" width="2" height="48" />
-                    <rect x="164" y="0" width="4" height="48" />
-                    <rect x="171" y="0" width="3" height="48" />
-                    <rect x="177" y="0" width="5" height="48" />
-                    <rect x="185" y="0" width="2" height="48" />
-                    <rect x="190" y="0" width="4" height="48" />
-                    <rect x="197" y="0" width="1" height="48" />
-                    <rect x="201" y="0" width="6" height="48" />
-                    <rect x="210" y="0" width="3" height="48" />
-                    <rect x="216" y="0" width="2" height="48" />
-                    <rect x="221" y="0" width="5" height="48" />
-                    <rect x="229" y="0" width="2" height="48" />
-                    <rect x="234" y="0" width="4" height="48" />
-                    <rect x="241" y="0" width="3" height="48" />
-                    <rect x="247" y="0" width="5" height="48" />
-                    <rect x="255" y="0" width="2" height="48" />
-                    <rect x="260" y="0" width="4" height="48" />
-                    <rect x="267" y="0" width="1" height="48" />
-                    <rect x="271" y="0" width="5" height="48" />
-                    <rect x="279" y="0" width="3" height="48" />
-                    <rect x="285" y="0" width="2" height="48" />
-                    <rect x="290" y="0" width="4" height="48" />
-                    <rect x="296" y="0" width="4" height="48" />
-                  </g>
-                </svg>
-                <span
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: "900",
-                    display: "block",
-                    letterSpacing: "2px",
-                    marginTop: "2mm",
-                  }}
-                >
+              {/* Barcode & AWB */}
+              <div style={{ padding: "3mm 0", borderBottom: "1px solid black", textAlign: "center" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2mm" }}>
+                  <svg className="w-full h-10" viewBox="0 0 300 48" preserveAspectRatio="none">
+                    <g fill="black">
+                      <rect x="0" y="0" width="3" height="48" /><rect x="5" y="0" width="2" height="48" />
+                      <rect x="10" y="0" width="4" height="48" /><rect x="16" y="0" width="1" height="48" />
+                      <rect x="20" y="0" width="5" height="48" /><rect x="28" y="0" width="2" height="48" />
+                      <rect x="33" y="0" width="3" height="48" /><rect x="38" y="0" width="4" height="48" />
+                      <rect x="45" y="0" width="2" height="48" /><rect x="50" y="0" width="5" height="48" />
+                      <rect x="58" y="0" width="2" height="48" /><rect x="63" y="0" width="4" height="48" />
+                      <rect x="70" y="0" width="3" height="48" /><rect x="75" y="0" width="1" height="48" />
+                      <rect x="80" y="0" width="6" height="48" /><rect x="89" y="0" width="2" height="48" />
+                      <rect x="94" y="0" width="4" height="48" /><rect x="101" y="0" width="3" height="48" />
+                      <rect x="107" y="0" width="5" height="48" /><rect x="115" y="0" width="2" height="48" />
+                      <rect x="120" y="0" width="4" height="48" /><rect x="127" y="0" width="1" height="48" />
+                      <rect x="131" y="0" width="6" height="48" /><rect x="140" y="0" width="3" height="48" />
+                      <rect x="146" y="0" width="2" height="48" /><rect x="151" y="0" width="5" height="48" />
+                      <rect x="159" y="0" width="2" height="48" /><rect x="164" y="0" width="4" height="48" />
+                      <rect x="171" y="0" width="3" height="48" /><rect x="177" y="0" width="5" height="48" />
+                      <rect x="185" y="0" width="2" height="48" /><rect x="190" y="0" width="4" height="48" />
+                      <rect x="197" y="0" width="1" height="48" /><rect x="201" y="0" width="6" height="48" />
+                      <rect x="210" y="0" width="3" height="48" /><rect x="216" y="0" width="2" height="48" />
+                      <rect x="221" y="0" width="5" height="48" /><rect x="229" y="0" width="2" height="48" />
+                      <rect x="234" y="0" width="4" height="48" /><rect x="241" y="0" width="3" height="48" />
+                      <rect x="247" y="0" width="5" height="48" /><rect x="255" y="0" width="2" height="48" />
+                      <rect x="260" y="0" width="4" height="48" /><rect x="267" y="0" width="1" height="48" />
+                      <rect x="271" y="0" width="5" height="48" /><rect x="279" y="0" width="3" height="48" />
+                      <rect x="285" y="0" width="2" height="48" /><rect x="290" y="0" width="4" height="48" />
+                      <rect x="296" y="0" width="4" height="48" />
+                    </g>
+                  </svg>
+                  <div style={{ width: "9mm", height: "9mm", border: "1px solid black", padding: "0.5mm" }}>
+                    <QrCode style={{ width: "100%", height: "100%" }} />
+                  </div>
+                </div>
+                <span style={{ fontSize: "11px", fontWeight: "900", display: "block", marginTop: "1mm" }}>
                   AWB: {tracking}
                 </span>
               </div>
 
-              {/* Payment Type */}
+              {/* Payment Strip */}
               <div
                 style={{
-                  padding: "2mm",
-                  borderBottom: "2px solid black",
+                  padding: "1.5mm",
+                  borderBottom: "1px solid black",
                   textAlign: "center",
                   fontWeight: "900",
-                  textTransform: "uppercase",
-                  fontSize: "12px",
-                  background: isCOD ? "black" : "white",
+                  fontSize: "10px",
+                  background: isCOD ? "black" : "#f1f5f9",
                   color: isCOD ? "white" : "black",
                 }}
               >
                 {isCOD
-                  ? `CASH ON DELIVERY (COD) — COLLECT ₹${order.total.toLocaleString("en-IN")}`
-                  : "★ PREPAID SHIPMENT — DO NOT COLLECT CASH ★"}
+                  ? `CASH ON DELIVERY (COD): COLLECT ₹${order.total.toLocaleString("en-IN")}`
+                  : "PREPAID — DO NOT COLLECT CASH"}
               </div>
 
-              {/* Consignee Details */}
-              <div
-                style={{
-                  padding: "3mm 0",
-                  borderBottom: "2px solid black",
-                }}
-              >
-                <span style={{ fontSize: "9px", fontWeight: "900", textTransform: "uppercase" }}>
+              {/* Consignee */}
+              <div style={{ padding: "2.5mm 0", borderBottom: "1px solid black" }}>
+                <span style={{ fontSize: "8px", fontWeight: "900", textTransform: "uppercase" }}>
                   SHIP TO (CONSIGNEE):
                 </span>
-                <strong
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "900",
-                    display: "block",
-                    textTransform: "uppercase",
-                    marginTop: "1mm",
-                  }}
-                >
+                <strong style={{ fontSize: "12px", fontWeight: "900", display: "block" }}>
                   {address.fullName}
                 </strong>
-                <p style={{ fontSize: "11px", margin: "1mm 0" }}>
-                  {address.addressLine1}
-                  {address.addressLine2 ? `, ${address.addressLine2}` : ""}
-                </p>
-                <p style={{ fontSize: "11px", margin: "1mm 0" }}>
-                  {address.city}, {address.state}
-                </p>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginTop: "2mm",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "13px",
-                      fontWeight: "900",
-                      background: "black",
-                      color: "white",
-                      padding: "1px 5px",
-                    }}
-                  >
+                <div>{address.addressLine1} {address.addressLine2}</div>
+                <div>{address.city}, {address.state}</div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "1.5mm" }}>
+                  <span style={{ fontSize: "12px", fontWeight: "900", background: "black", color: "white", padding: "1px 4px" }}>
                     PIN: {address.postalCode}
                   </span>
-                  <span style={{ fontSize: "11px", fontWeight: "700" }}>
-                    TEL: {address.phone}
-                  </span>
+                  <span style={{ fontSize: "10px", fontWeight: "700" }}>TEL: {address.phone}</span>
                 </div>
               </div>
 
-              {/* Shipped By */}
-              <div
-                style={{
-                  padding: "2.5mm 0",
-                  borderBottom: "2px solid black",
-                  fontSize: "10px",
-                }}
-              >
-                <span style={{ fontSize: "8px", fontWeight: "900", textTransform: "uppercase" }}>
-                  RETURN ADDRESS (SELLER):
-                </span>
-                <strong style={{ fontSize: "11px", fontWeight: "900", display: "block" }}>
-                  AVRO OFFICIAL STORE (LOGISTICS WAREHOUSE)
-                </strong>
-                <p style={{ margin: "0.5mm 0" }}>
-                  Technext Logistics Hub, Sector 62, Noida, UP - 201309
-                </p>
-                <p style={{ margin: "0.5mm 0", fontWeight: "700" }}>
-                  GSTIN: 07AAACT9021M1Z4
-                </p>
+              {/* Seller */}
+              <div style={{ padding: "2mm 0", borderBottom: "1px solid black", fontSize: "9px" }}>
+                <span style={{ fontSize: "7px", fontWeight: "900", textTransform: "uppercase" }}>RETURN (SELLER):</span>
+                <strong style={{ display: "block", fontSize: "10px" }}>{brandName}</strong>
+                <div>{sellerAddress}, {sellerCity}, {sellerState} - {sellerPostalCode}</div>
+                <div>Helpline: {sellerPhone} | GSTIN: {sellerGstin}</div>
               </div>
 
-              {/* Package Meta */}
-              <div style={{ padding: "2.5mm 0", borderBottom: "2px solid black" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px" }}>
-                  <span>
-                    ORDER: <strong>{order.orderNumber}</strong>
-                  </span>
-                  <span>
-                    WT: <strong>0.450 KG</strong>
-                  </span>
-                  <span>
-                    BOX: <strong>1 of 1</strong>
-                  </span>
+              {/* Manifest */}
+              <div style={{ padding: "2mm 0", borderBottom: "1px solid black", fontSize: "9px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span>ORDER: <strong>{order.orderNumber}</strong></span>
+                  <span>WT: <strong>0.450 KG</strong></span>
+                  <span>BOX: <strong>1/1</strong></span>
                 </div>
-                <div style={{ marginTop: "2mm", fontSize: "9px" }}>
-                  <span style={{ fontWeight: "700" }}>ITEMS: </span>
+                <div style={{ marginTop: "1mm" }}>
+                  <strong>ITEMS: </strong>
                   {order.items?.map((it) => `${it.quantity}x ${it.title}`).join(", ")}
                 </div>
               </div>
 
               {/* Footer */}
-              <div
-                style={{
-                  paddingTop: "2mm",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  fontSize: "8px",
-                }}
-              >
+              <div style={{ paddingTop: "1.5mm", display: "flex", justifyContent: "space-between", fontSize: "8px" }}>
                 <span>SECURED BY AVRO LOGISTICS</span>
                 <span>ATTEMPTS: 3</span>
               </div>
@@ -673,7 +555,6 @@ export default function ShippingLabelModal({ orders, onClose }: ShippingLabelMod
       {/* Global CSS for Clean Thermal Printing */}
       <style jsx global>{`
         @media print {
-          /* Hide everything except printable-shipping-labels */
           body * {
             visibility: hidden !important;
           }

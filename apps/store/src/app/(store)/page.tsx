@@ -78,9 +78,10 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
   const textMutedColor = !themeParam && customOverrides.textMuted ? customOverrides.textMuted : themeDef.palette.textMuted;
   const buttonRadius = !themeParam && customOverrides.buttonRadius ? customOverrides.buttonRadius : themeDef.typography.buttonRadius;
   const badgeRadius = !themeParam && customOverrides.badgeRadius ? customOverrides.badgeRadius : themeDef.typography.badgeRadius;
-  const heroBadge = !themeParam && customOverrides.heroBadge ? customOverrides.heroBadge : themeDef.hero.badge;
+  const heroBadge = !themeParam && (dbTheme?.heroBadge || customOverrides.heroBadge) ? (dbTheme?.heroBadge || customOverrides.heroBadge) : themeDef.hero.badge;
   const headlineHighlight = !themeParam && customOverrides.headlineHighlight !== undefined ? customOverrides.headlineHighlight : themeDef.hero.headlineHighlight;
-  const ctaPrimary = !themeParam && customOverrides.ctaPrimary ? customOverrides.ctaPrimary : themeDef.hero.ctaPrimary;
+  const ctaPrimary = !themeParam && (dbTheme?.heroCtaText || customOverrides.ctaPrimary) ? (dbTheme?.heroCtaText || customOverrides.ctaPrimary) : themeDef.hero.ctaPrimary;
+  const ctaPrimaryLink = !themeParam && dbTheme?.heroCtaLink ? dbTheme.heroCtaLink : "/shop";
   const ctaSecondary = !themeParam && customOverrides.ctaSecondary ? customOverrides.ctaSecondary : themeDef.hero.ctaSecondary;
   const trustBadges = !themeParam && Array.isArray(customOverrides.trustBadges) && customOverrides.trustBadges.length > 0 ? customOverrides.trustBadges : themeDef.trustBadges;
 
@@ -176,7 +177,7 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
               {/* CTA Buttons */}
               <div className="flex flex-wrap gap-4 pt-2">
                 <Link
-                  href="/shop"
+                  href={ctaPrimaryLink}
                   className="px-6 py-3.5 font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-md text-white hover:opacity-95"
                   style={{
                     backgroundColor: primaryColor,

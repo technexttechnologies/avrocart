@@ -162,6 +162,7 @@ export default function StoreAdminLayout({
   ];
 
   const settingItems = [
+    { label: "General & Branding", href: "/admin/settings/general", icon: Store },
     { label: "Team & User Access", href: "/admin/users", icon: Users },
     { label: "My Profile & Password", href: "/admin/profile", icon: ShieldCheck },
     { label: "Payment Gateways", href: "/admin/settings/payments", icon: CreditCard },

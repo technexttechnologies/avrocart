@@ -12,6 +12,8 @@ import {
   RotateCcw,
   Zap,
   Heart,
+  Play,
+  Film,
 } from "lucide-react";
 
 export function ProductViewClient({ product }: { product: any }) {
@@ -21,10 +23,12 @@ export function ProductViewClient({ product }: { product: any }) {
 
   const isSaved = isInWishlist(product.id);
 
-  const [selectedImg, setSelectedImg] = useState(
+  const initialImage =
     product.images?.[0]?.url ||
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"
-  );
+    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80";
+
+  const [selectedImg, setSelectedImg] = useState<string>(initialImage);
+  const [activeMediaType, setActiveMediaType] = useState<"image" | "video">("image");
 
   const [selectedVariant, setSelectedVariant] = useState<any | null>(
     product.variants?.length > 0 ? product.variants[0] : null
@@ -66,36 +70,131 @@ export function ProductViewClient({ product }: { product: any }) {
     router.push("/checkout");
   };
 
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-      {/* Left Gallery */}
-      <div className="lg:col-span-7 space-y-4">
-        <div className="aspect-square bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-          <img
-            src={selectedImg}
-            alt={product.title}
-            className="w-full h-full object-cover transition-all duration-300"
-          />
-        </div>
+  // Helper for YouTube/Vimeo embed URL
+  const getEmbedVideoUrl = (url: string) => {
+    if (!url) return null;
+    const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+    if (ytMatch && ytMatch[1]) {
+      return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0`;
+    }
+    const vimeoMatch = url.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/[^\/]*\/videos\/|album\/(?:\d+\/)?video\/|video\/|)(\d+)/);
+    if (vimeoMatch && vimeoMatch[1]) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`;
+    }
+    return null;
+  };
 
-        {product.images?.length > 1 && (
-          <div className="flex gap-3 overflow-x-auto pb-2">
-            {product.images.map((img: any, idx: number) => (
-              <button
-                key={img.id || idx}
-                onClick={() => setSelectedImg(img.url)}
-                className={`w-20 h-20 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all ${
-                  selectedImg === img.url ? "border-[#2563EB] shadow-sm" : "border-slate-200 hover:border-slate-400"
-                }`}
-              >
-                <img src={img.url} alt="" className="w-full h-full object-cover" />
-              </button>
-            ))}
+  const embedUrl = product.videoUrl ? getEmbedVideoUrl(product.videoUrl) : null;
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+      {/* Media Gallery with Right Scroll View */}
+      <div className="lg:col-span-7">
+        <div className="flex flex-col-reverse md:flex-row gap-4 items-start">
+          {/* Main Active Media Viewport */}
+          <div className="flex-1 w-full aspect-square bg-slate-900/5 rounded-3xl border border-slate-200 overflow-hidden shadow-sm relative flex items-center justify-center">
+            {activeMediaType === "video" && product.videoUrl ? (
+              embedUrl ? (
+                <iframe
+                  src={embedUrl}
+                  title={product.videoTitle || product.title}
+                  className="w-full h-full border-0 rounded-3xl"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  src={product.videoUrl}
+                  controls
+                  autoPlay
+                  loop
+                  playsInline
+                  className="w-full h-full object-contain bg-black rounded-3xl"
+                />
+              )
+            ) : (
+              <img
+                src={selectedImg}
+                alt={product.title}
+                className="w-full h-full object-cover transition-all duration-300"
+              />
+            )}
+
+            {/* Video overlay badge if video is active */}
+            {activeMediaType === "video" && product.videoTitle && (
+              <div className="absolute top-3 left-3 bg-black/75 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-white flex items-center gap-1.5 shadow">
+                <Film className="w-3.5 h-3.5 text-blue-400" />
+                <span>{product.videoTitle}</span>
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Right Scroll View (Vertical thumbnail gallery on md/lg, horizontal on mobile) */}
+          <div className="w-full md:w-28 flex-shrink-0 flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto md:max-h-[580px] pr-1 pb-2 md:pb-0 scrollbar-thin">
+            {/* 1. All Product Images */}
+            {product.images?.map((img: any, idx: number) => {
+              const isActive = activeMediaType === "image" && selectedImg === img.url;
+              return (
+                <button
+                  key={img.id || idx}
+                  type="button"
+                  onClick={() => {
+                    setSelectedImg(img.url);
+                    setActiveMediaType("image");
+                  }}
+                  className={`w-20 md:w-full aspect-square rounded-2xl overflow-hidden border-2 flex-shrink-0 transition-all relative group bg-white shadow-2xs ${
+                    isActive
+                      ? "border-[#2563EB] ring-2 ring-[#2563EB]/20 shadow-md"
+                      : "border-slate-200 hover:border-slate-400 opacity-80 hover:opacity-100"
+                  }`}
+                  title={img.altText || `View photo ${idx + 1}`}
+                >
+                  <img
+                    src={img.url}
+                    alt={img.altText || ""}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  {img.isPrimary && (
+                    <span className="absolute bottom-1 left-1 bg-black/60 backdrop-blur-xs text-white text-[8px] font-bold px-1 rounded uppercase">
+                      Primary
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+
+            {/* 2. Product Demonstration Video Thumbnail (if present) */}
+            {product.videoUrl && (
+              <button
+                type="button"
+                onClick={() => setActiveMediaType("video")}
+                className={`w-20 md:w-full aspect-square rounded-2xl overflow-hidden border-2 flex-shrink-0 transition-all relative group bg-slate-900 flex flex-col items-center justify-center text-white shadow-2xs ${
+                  activeMediaType === "video"
+                    ? "border-[#2563EB] ring-2 ring-[#2563EB]/20 shadow-md"
+                    : "border-slate-800 hover:border-blue-500 opacity-90 hover:opacity-100"
+                }`}
+                title={product.videoTitle || "Play product video demonstration"}
+              >
+                {product.images?.[0]?.url && (
+                  <img
+                    src={product.images[0].url}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-300"
+                  />
+                )}
+                <div className="relative z-10 w-9 h-9 rounded-full bg-blue-600/90 group-hover:bg-blue-600 flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
+                  <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+                </div>
+                <span className="relative z-10 text-[9px] font-extrabold uppercase tracking-wider text-blue-200 mt-1">
+                  Video
+                </span>
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Right Details */}
+      {/* Right Details Column */}
       <div className="lg:col-span-5 space-y-6">
         <div>
           {product.category && (

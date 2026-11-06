@@ -25,6 +25,8 @@ import {
   ShoppingBag,
   ArrowRight,
   Info,
+  Upload,
+  Loader2,
 } from "lucide-react";
 import { AVRO_THEMES, AvroThemeDefinition } from "@/lib/themes-registry";
 
@@ -57,6 +59,7 @@ export default function ThemesAdminPage() {
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isUploadingHero, setIsUploadingHero] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<string>("ALL");
   const [activatingCode, setActivatingCode] = useState<string | null>(null);
 
@@ -675,7 +678,43 @@ export default function ThemesAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Hero Image URL</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-bold text-slate-700">Hero Banner Image</label>
+                    <label className="cursor-pointer text-[10px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                      {isUploadingHero ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <Upload className="w-3 h-3" />
+                      )}
+                      <span>{isUploadingHero ? "Uploading..." : "Upload from PC"}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          setIsUploadingHero(true);
+                          try {
+                            const data = new FormData();
+                            data.append("file", file);
+                            const res = await fetch("/api/admin/media", {
+                              method: "POST",
+                              body: data,
+                            });
+                            const result = await res.json();
+                            if (result.success && result.url) {
+                              setThemeConfig({ ...themeConfig, bannerImageUrl: result.url });
+                            }
+                          } catch (err) {
+                            console.error(err);
+                          } finally {
+                            setIsUploadingHero(false);
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
                   <input
                     type="text"
                     value={themeConfig.bannerImageUrl || ""}

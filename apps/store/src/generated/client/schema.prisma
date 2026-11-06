@@ -288,6 +288,17 @@ model StoreThemeSetting {
   bannerHeadline      String   @default("Your Premium Storefront")
   bannerSubheadline   String   @default("Discover handcrafted, top-tier products.")
   bannerImageUrl      String?
+  heroBadge           String?  @default("EXCLUSIVE COLLECTION")
+  heroCtaText         String?  @default("Shop Catalog")
+  heroCtaLink         String?  @default("/shop")
+  companyAddress      String?
+  companyCity         String?
+  companyState        String?
+  companyPostalCode   String?
+  companyCountry      String?  @default("India")
+  supportEmail        String?
+  supportPhone        String?
+  taxId               String? // GSTIN or Tax Registration Number
   announcementBarText String?  @default("Free Shipping on Orders Over ₹999")
   showAnnouncementBar Boolean  @default(true)
   socialLinksJson     String?  @default("{\"facebook\":\"https://facebook.com\",\"instagram\":\"https://instagram.com\",\"twitter\":\"https://twitter.com\"}")

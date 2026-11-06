@@ -203,21 +203,39 @@ export default function StoreFooter({ theme }: { theme?: any }) {
               className="uppercase font-bold tracking-wider"
               style={{ color: isDarkFooter ? "#FFFFFF" : "#0F172A" }}
             >
-              AVRO Deployment
+              Store Headquarters
             </strong>
             <div
-              className="p-3 rounded-xl space-y-1 text-[11px] border"
+              className="p-3.5 rounded-xl space-y-1.5 text-[11px] border"
               style={{
                 backgroundColor: isDarkFooter ? "rgba(255,255,255,0.05)" : "#F1F5F9",
                 borderColor: isDarkFooter ? "rgba(255,255,255,0.1)" : "#E2E8F0",
               }}
             >
               <span className="font-bold block" style={{ color: isDarkFooter ? "#FFFFFF" : "#0F172A" }}>
-                Theme: {matchingThemeDef.name} ({matchingThemeDef.industry})
+                {brandName}
               </span>
-              <p className={isDarkFooter ? "text-slate-400" : "text-slate-500"}>
-                Self-hosted store engine. Verified license by TECHNEXT TECHNOLOGIES.
+              <p className={isDarkFooter ? "text-slate-300" : "text-slate-600"}>
+                {theme?.companyAddress || "Technext Cyber Park, Sector 62"}
+                {theme?.companyCity ? `, ${theme.companyCity}` : ", Noida"}
+                {theme?.companyState ? `, ${theme.companyState}` : ", UP"}
+                {theme?.companyPostalCode ? ` - ${theme.companyPostalCode}` : " - 201309"}
               </p>
+              {theme?.supportEmail && (
+                <p className="font-medium text-blue-500 hover:underline">
+                  {theme.supportEmail}
+                </p>
+              )}
+              {theme?.supportPhone && (
+                <p className={isDarkFooter ? "text-slate-400" : "text-slate-600"}>
+                  Helpline: {theme.supportPhone}
+                </p>
+              )}
+              {theme?.taxId && (
+                <span className="font-mono text-[10px] text-slate-400 block pt-0.5">
+                  GSTIN: {theme.taxId}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -230,11 +248,11 @@ export default function StoreFooter({ theme }: { theme?: any }) {
           }}
         >
           <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
-            <div className="bg-white px-2.5 py-1 rounded-lg shadow-2xs">
+            <div className="bg-white px-2.5 py-1 rounded-lg shadow-2xs flex items-center justify-center">
               <img
-                src="/avro-logo.png"
-                alt="AVROCART by TECHNEXT"
-                className="h-5 w-auto object-contain"
+                src={theme?.logoUrl || "/avro-logo.png"}
+                alt={brandName}
+                className="h-5 max-w-[100px] w-auto object-contain"
               />
             </div>
             <p>{footerText}</p>

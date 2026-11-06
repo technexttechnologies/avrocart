@@ -20922,6 +20922,17 @@ export namespace Prisma {
     bannerHeadline: string | null
     bannerSubheadline: string | null
     bannerImageUrl: string | null
+    heroBadge: string | null
+    heroCtaText: string | null
+    heroCtaLink: string | null
+    companyAddress: string | null
+    companyCity: string | null
+    companyState: string | null
+    companyPostalCode: string | null
+    companyCountry: string | null
+    supportEmail: string | null
+    supportPhone: string | null
+    taxId: string | null
     announcementBarText: string | null
     showAnnouncementBar: boolean | null
     socialLinksJson: string | null
@@ -20941,6 +20952,17 @@ export namespace Prisma {
     bannerHeadline: string | null
     bannerSubheadline: string | null
     bannerImageUrl: string | null
+    heroBadge: string | null
+    heroCtaText: string | null
+    heroCtaLink: string | null
+    companyAddress: string | null
+    companyCity: string | null
+    companyState: string | null
+    companyPostalCode: string | null
+    companyCountry: string | null
+    supportEmail: string | null
+    supportPhone: string | null
+    taxId: string | null
     announcementBarText: string | null
     showAnnouncementBar: boolean | null
     socialLinksJson: string | null
@@ -20960,6 +20982,17 @@ export namespace Prisma {
     bannerHeadline: number
     bannerSubheadline: number
     bannerImageUrl: number
+    heroBadge: number
+    heroCtaText: number
+    heroCtaLink: number
+    companyAddress: number
+    companyCity: number
+    companyState: number
+    companyPostalCode: number
+    companyCountry: number
+    supportEmail: number
+    supportPhone: number
+    taxId: number
     announcementBarText: number
     showAnnouncementBar: number
     socialLinksJson: number
@@ -20981,6 +21014,17 @@ export namespace Prisma {
     bannerHeadline?: true
     bannerSubheadline?: true
     bannerImageUrl?: true
+    heroBadge?: true
+    heroCtaText?: true
+    heroCtaLink?: true
+    companyAddress?: true
+    companyCity?: true
+    companyState?: true
+    companyPostalCode?: true
+    companyCountry?: true
+    supportEmail?: true
+    supportPhone?: true
+    taxId?: true
     announcementBarText?: true
     showAnnouncementBar?: true
     socialLinksJson?: true
@@ -21000,6 +21044,17 @@ export namespace Prisma {
     bannerHeadline?: true
     bannerSubheadline?: true
     bannerImageUrl?: true
+    heroBadge?: true
+    heroCtaText?: true
+    heroCtaLink?: true
+    companyAddress?: true
+    companyCity?: true
+    companyState?: true
+    companyPostalCode?: true
+    companyCountry?: true
+    supportEmail?: true
+    supportPhone?: true
+    taxId?: true
     announcementBarText?: true
     showAnnouncementBar?: true
     socialLinksJson?: true
@@ -21019,6 +21074,17 @@ export namespace Prisma {
     bannerHeadline?: true
     bannerSubheadline?: true
     bannerImageUrl?: true
+    heroBadge?: true
+    heroCtaText?: true
+    heroCtaLink?: true
+    companyAddress?: true
+    companyCity?: true
+    companyState?: true
+    companyPostalCode?: true
+    companyCountry?: true
+    supportEmail?: true
+    supportPhone?: true
+    taxId?: true
     announcementBarText?: true
     showAnnouncementBar?: true
     socialLinksJson?: true
@@ -21111,6 +21177,17 @@ export namespace Prisma {
     bannerHeadline: string
     bannerSubheadline: string
     bannerImageUrl: string | null
+    heroBadge: string | null
+    heroCtaText: string | null
+    heroCtaLink: string | null
+    companyAddress: string | null
+    companyCity: string | null
+    companyState: string | null
+    companyPostalCode: string | null
+    companyCountry: string | null
+    supportEmail: string | null
+    supportPhone: string | null
+    taxId: string | null
     announcementBarText: string | null
     showAnnouncementBar: boolean
     socialLinksJson: string | null
@@ -21147,6 +21224,17 @@ export namespace Prisma {
     bannerHeadline?: boolean
     bannerSubheadline?: boolean
     bannerImageUrl?: boolean
+    heroBadge?: boolean
+    heroCtaText?: boolean
+    heroCtaLink?: boolean
+    companyAddress?: boolean
+    companyCity?: boolean
+    companyState?: boolean
+    companyPostalCode?: boolean
+    companyCountry?: boolean
+    supportEmail?: boolean
+    supportPhone?: boolean
+    taxId?: boolean
     announcementBarText?: boolean
     showAnnouncementBar?: boolean
     socialLinksJson?: boolean
@@ -21166,6 +21254,17 @@ export namespace Prisma {
     bannerHeadline?: boolean
     bannerSubheadline?: boolean
     bannerImageUrl?: boolean
+    heroBadge?: boolean
+    heroCtaText?: boolean
+    heroCtaLink?: boolean
+    companyAddress?: boolean
+    companyCity?: boolean
+    companyState?: boolean
+    companyPostalCode?: boolean
+    companyCountry?: boolean
+    supportEmail?: boolean
+    supportPhone?: boolean
+    taxId?: boolean
     announcementBarText?: boolean
     showAnnouncementBar?: boolean
     socialLinksJson?: boolean
@@ -21185,6 +21284,17 @@ export namespace Prisma {
     bannerHeadline?: boolean
     bannerSubheadline?: boolean
     bannerImageUrl?: boolean
+    heroBadge?: boolean
+    heroCtaText?: boolean
+    heroCtaLink?: boolean
+    companyAddress?: boolean
+    companyCity?: boolean
+    companyState?: boolean
+    companyPostalCode?: boolean
+    companyCountry?: boolean
+    supportEmail?: boolean
+    supportPhone?: boolean
+    taxId?: boolean
     announcementBarText?: boolean
     showAnnouncementBar?: boolean
     socialLinksJson?: boolean
@@ -21208,6 +21318,17 @@ export namespace Prisma {
       bannerHeadline: string
       bannerSubheadline: string
       bannerImageUrl: string | null
+      heroBadge: string | null
+      heroCtaText: string | null
+      heroCtaLink: string | null
+      companyAddress: string | null
+      companyCity: string | null
+      companyState: string | null
+      companyPostalCode: string | null
+      companyCountry: string | null
+      supportEmail: string | null
+      supportPhone: string | null
+      taxId: string | null
       announcementBarText: string | null
       showAnnouncementBar: boolean
       socialLinksJson: string | null
@@ -21617,6 +21738,17 @@ export namespace Prisma {
     readonly bannerHeadline: FieldRef<"StoreThemeSetting", 'String'>
     readonly bannerSubheadline: FieldRef<"StoreThemeSetting", 'String'>
     readonly bannerImageUrl: FieldRef<"StoreThemeSetting", 'String'>
+    readonly heroBadge: FieldRef<"StoreThemeSetting", 'String'>
+    readonly heroCtaText: FieldRef<"StoreThemeSetting", 'String'>
+    readonly heroCtaLink: FieldRef<"StoreThemeSetting", 'String'>
+    readonly companyAddress: FieldRef<"StoreThemeSetting", 'String'>
+    readonly companyCity: FieldRef<"StoreThemeSetting", 'String'>
+    readonly companyState: FieldRef<"StoreThemeSetting", 'String'>
+    readonly companyPostalCode: FieldRef<"StoreThemeSetting", 'String'>
+    readonly companyCountry: FieldRef<"StoreThemeSetting", 'String'>
+    readonly supportEmail: FieldRef<"StoreThemeSetting", 'String'>
+    readonly supportPhone: FieldRef<"StoreThemeSetting", 'String'>
+    readonly taxId: FieldRef<"StoreThemeSetting", 'String'>
     readonly announcementBarText: FieldRef<"StoreThemeSetting", 'String'>
     readonly showAnnouncementBar: FieldRef<"StoreThemeSetting", 'Boolean'>
     readonly socialLinksJson: FieldRef<"StoreThemeSetting", 'String'>
@@ -22232,6 +22364,17 @@ export namespace Prisma {
     bannerHeadline: 'bannerHeadline',
     bannerSubheadline: 'bannerSubheadline',
     bannerImageUrl: 'bannerImageUrl',
+    heroBadge: 'heroBadge',
+    heroCtaText: 'heroCtaText',
+    heroCtaLink: 'heroCtaLink',
+    companyAddress: 'companyAddress',
+    companyCity: 'companyCity',
+    companyState: 'companyState',
+    companyPostalCode: 'companyPostalCode',
+    companyCountry: 'companyCountry',
+    supportEmail: 'supportEmail',
+    supportPhone: 'supportPhone',
+    taxId: 'taxId',
     announcementBarText: 'announcementBarText',
     showAnnouncementBar: 'showAnnouncementBar',
     socialLinksJson: 'socialLinksJson',
@@ -23864,6 +24007,17 @@ export namespace Prisma {
     bannerHeadline?: StringFilter<"StoreThemeSetting"> | string
     bannerSubheadline?: StringFilter<"StoreThemeSetting"> | string
     bannerImageUrl?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    heroBadge?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    heroCtaText?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    heroCtaLink?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    companyAddress?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    companyCity?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    companyState?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    companyPostalCode?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    companyCountry?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    supportEmail?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    supportPhone?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    taxId?: StringNullableFilter<"StoreThemeSetting"> | string | null
     announcementBarText?: StringNullableFilter<"StoreThemeSetting"> | string | null
     showAnnouncementBar?: BoolFilter<"StoreThemeSetting"> | boolean
     socialLinksJson?: StringNullableFilter<"StoreThemeSetting"> | string | null
@@ -23883,6 +24037,17 @@ export namespace Prisma {
     bannerHeadline?: SortOrder
     bannerSubheadline?: SortOrder
     bannerImageUrl?: SortOrderInput | SortOrder
+    heroBadge?: SortOrderInput | SortOrder
+    heroCtaText?: SortOrderInput | SortOrder
+    heroCtaLink?: SortOrderInput | SortOrder
+    companyAddress?: SortOrderInput | SortOrder
+    companyCity?: SortOrderInput | SortOrder
+    companyState?: SortOrderInput | SortOrder
+    companyPostalCode?: SortOrderInput | SortOrder
+    companyCountry?: SortOrderInput | SortOrder
+    supportEmail?: SortOrderInput | SortOrder
+    supportPhone?: SortOrderInput | SortOrder
+    taxId?: SortOrderInput | SortOrder
     announcementBarText?: SortOrderInput | SortOrder
     showAnnouncementBar?: SortOrder
     socialLinksJson?: SortOrderInput | SortOrder
@@ -23905,6 +24070,17 @@ export namespace Prisma {
     bannerHeadline?: StringFilter<"StoreThemeSetting"> | string
     bannerSubheadline?: StringFilter<"StoreThemeSetting"> | string
     bannerImageUrl?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    heroBadge?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    heroCtaText?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    heroCtaLink?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    companyAddress?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    companyCity?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    companyState?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    companyPostalCode?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    companyCountry?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    supportEmail?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    supportPhone?: StringNullableFilter<"StoreThemeSetting"> | string | null
+    taxId?: StringNullableFilter<"StoreThemeSetting"> | string | null
     announcementBarText?: StringNullableFilter<"StoreThemeSetting"> | string | null
     showAnnouncementBar?: BoolFilter<"StoreThemeSetting"> | boolean
     socialLinksJson?: StringNullableFilter<"StoreThemeSetting"> | string | null
@@ -23924,6 +24100,17 @@ export namespace Prisma {
     bannerHeadline?: SortOrder
     bannerSubheadline?: SortOrder
     bannerImageUrl?: SortOrderInput | SortOrder
+    heroBadge?: SortOrderInput | SortOrder
+    heroCtaText?: SortOrderInput | SortOrder
+    heroCtaLink?: SortOrderInput | SortOrder
+    companyAddress?: SortOrderInput | SortOrder
+    companyCity?: SortOrderInput | SortOrder
+    companyState?: SortOrderInput | SortOrder
+    companyPostalCode?: SortOrderInput | SortOrder
+    companyCountry?: SortOrderInput | SortOrder
+    supportEmail?: SortOrderInput | SortOrder
+    supportPhone?: SortOrderInput | SortOrder
+    taxId?: SortOrderInput | SortOrder
     announcementBarText?: SortOrderInput | SortOrder
     showAnnouncementBar?: SortOrder
     socialLinksJson?: SortOrderInput | SortOrder
@@ -23949,6 +24136,17 @@ export namespace Prisma {
     bannerHeadline?: StringWithAggregatesFilter<"StoreThemeSetting"> | string
     bannerSubheadline?: StringWithAggregatesFilter<"StoreThemeSetting"> | string
     bannerImageUrl?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
+    heroBadge?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
+    heroCtaText?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
+    heroCtaLink?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
+    companyAddress?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
+    companyCity?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
+    companyState?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
+    companyPostalCode?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
+    companyCountry?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
+    supportEmail?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
+    supportPhone?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
+    taxId?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
     announcementBarText?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
     showAnnouncementBar?: BoolWithAggregatesFilter<"StoreThemeSetting"> | boolean
     socialLinksJson?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
@@ -25695,6 +25893,17 @@ export namespace Prisma {
     bannerHeadline?: string
     bannerSubheadline?: string
     bannerImageUrl?: string | null
+    heroBadge?: string | null
+    heroCtaText?: string | null
+    heroCtaLink?: string | null
+    companyAddress?: string | null
+    companyCity?: string | null
+    companyState?: string | null
+    companyPostalCode?: string | null
+    companyCountry?: string | null
+    supportEmail?: string | null
+    supportPhone?: string | null
+    taxId?: string | null
     announcementBarText?: string | null
     showAnnouncementBar?: boolean
     socialLinksJson?: string | null
@@ -25714,6 +25923,17 @@ export namespace Prisma {
     bannerHeadline?: string
     bannerSubheadline?: string
     bannerImageUrl?: string | null
+    heroBadge?: string | null
+    heroCtaText?: string | null
+    heroCtaLink?: string | null
+    companyAddress?: string | null
+    companyCity?: string | null
+    companyState?: string | null
+    companyPostalCode?: string | null
+    companyCountry?: string | null
+    supportEmail?: string | null
+    supportPhone?: string | null
+    taxId?: string | null
     announcementBarText?: string | null
     showAnnouncementBar?: boolean
     socialLinksJson?: string | null
@@ -25733,6 +25953,17 @@ export namespace Prisma {
     bannerHeadline?: StringFieldUpdateOperationsInput | string
     bannerSubheadline?: StringFieldUpdateOperationsInput | string
     bannerImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    heroBadge?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaText?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaLink?: NullableStringFieldUpdateOperationsInput | string | null
+    companyAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    companyCity?: NullableStringFieldUpdateOperationsInput | string | null
+    companyState?: NullableStringFieldUpdateOperationsInput | string | null
+    companyPostalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    companyCountry?: NullableStringFieldUpdateOperationsInput | string | null
+    supportEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    supportPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    taxId?: NullableStringFieldUpdateOperationsInput | string | null
     announcementBarText?: NullableStringFieldUpdateOperationsInput | string | null
     showAnnouncementBar?: BoolFieldUpdateOperationsInput | boolean
     socialLinksJson?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25752,6 +25983,17 @@ export namespace Prisma {
     bannerHeadline?: StringFieldUpdateOperationsInput | string
     bannerSubheadline?: StringFieldUpdateOperationsInput | string
     bannerImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    heroBadge?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaText?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaLink?: NullableStringFieldUpdateOperationsInput | string | null
+    companyAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    companyCity?: NullableStringFieldUpdateOperationsInput | string | null
+    companyState?: NullableStringFieldUpdateOperationsInput | string | null
+    companyPostalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    companyCountry?: NullableStringFieldUpdateOperationsInput | string | null
+    supportEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    supportPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    taxId?: NullableStringFieldUpdateOperationsInput | string | null
     announcementBarText?: NullableStringFieldUpdateOperationsInput | string | null
     showAnnouncementBar?: BoolFieldUpdateOperationsInput | boolean
     socialLinksJson?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25771,6 +26013,17 @@ export namespace Prisma {
     bannerHeadline?: string
     bannerSubheadline?: string
     bannerImageUrl?: string | null
+    heroBadge?: string | null
+    heroCtaText?: string | null
+    heroCtaLink?: string | null
+    companyAddress?: string | null
+    companyCity?: string | null
+    companyState?: string | null
+    companyPostalCode?: string | null
+    companyCountry?: string | null
+    supportEmail?: string | null
+    supportPhone?: string | null
+    taxId?: string | null
     announcementBarText?: string | null
     showAnnouncementBar?: boolean
     socialLinksJson?: string | null
@@ -25790,6 +26043,17 @@ export namespace Prisma {
     bannerHeadline?: StringFieldUpdateOperationsInput | string
     bannerSubheadline?: StringFieldUpdateOperationsInput | string
     bannerImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    heroBadge?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaText?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaLink?: NullableStringFieldUpdateOperationsInput | string | null
+    companyAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    companyCity?: NullableStringFieldUpdateOperationsInput | string | null
+    companyState?: NullableStringFieldUpdateOperationsInput | string | null
+    companyPostalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    companyCountry?: NullableStringFieldUpdateOperationsInput | string | null
+    supportEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    supportPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    taxId?: NullableStringFieldUpdateOperationsInput | string | null
     announcementBarText?: NullableStringFieldUpdateOperationsInput | string | null
     showAnnouncementBar?: BoolFieldUpdateOperationsInput | boolean
     socialLinksJson?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25809,6 +26073,17 @@ export namespace Prisma {
     bannerHeadline?: StringFieldUpdateOperationsInput | string
     bannerSubheadline?: StringFieldUpdateOperationsInput | string
     bannerImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    heroBadge?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaText?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaLink?: NullableStringFieldUpdateOperationsInput | string | null
+    companyAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    companyCity?: NullableStringFieldUpdateOperationsInput | string | null
+    companyState?: NullableStringFieldUpdateOperationsInput | string | null
+    companyPostalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    companyCountry?: NullableStringFieldUpdateOperationsInput | string | null
+    supportEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    supportPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    taxId?: NullableStringFieldUpdateOperationsInput | string | null
     announcementBarText?: NullableStringFieldUpdateOperationsInput | string | null
     showAnnouncementBar?: BoolFieldUpdateOperationsInput | boolean
     socialLinksJson?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27022,6 +27297,17 @@ export namespace Prisma {
     bannerHeadline?: SortOrder
     bannerSubheadline?: SortOrder
     bannerImageUrl?: SortOrder
+    heroBadge?: SortOrder
+    heroCtaText?: SortOrder
+    heroCtaLink?: SortOrder
+    companyAddress?: SortOrder
+    companyCity?: SortOrder
+    companyState?: SortOrder
+    companyPostalCode?: SortOrder
+    companyCountry?: SortOrder
+    supportEmail?: SortOrder
+    supportPhone?: SortOrder
+    taxId?: SortOrder
     announcementBarText?: SortOrder
     showAnnouncementBar?: SortOrder
     socialLinksJson?: SortOrder
@@ -27041,6 +27327,17 @@ export namespace Prisma {
     bannerHeadline?: SortOrder
     bannerSubheadline?: SortOrder
     bannerImageUrl?: SortOrder
+    heroBadge?: SortOrder
+    heroCtaText?: SortOrder
+    heroCtaLink?: SortOrder
+    companyAddress?: SortOrder
+    companyCity?: SortOrder
+    companyState?: SortOrder
+    companyPostalCode?: SortOrder
+    companyCountry?: SortOrder
+    supportEmail?: SortOrder
+    supportPhone?: SortOrder
+    taxId?: SortOrder
     announcementBarText?: SortOrder
     showAnnouncementBar?: SortOrder
     socialLinksJson?: SortOrder
@@ -27060,6 +27357,17 @@ export namespace Prisma {
     bannerHeadline?: SortOrder
     bannerSubheadline?: SortOrder
     bannerImageUrl?: SortOrder
+    heroBadge?: SortOrder
+    heroCtaText?: SortOrder
+    heroCtaLink?: SortOrder
+    companyAddress?: SortOrder
+    companyCity?: SortOrder
+    companyState?: SortOrder
+    companyPostalCode?: SortOrder
+    companyCountry?: SortOrder
+    supportEmail?: SortOrder
+    supportPhone?: SortOrder
+    taxId?: SortOrder
     announcementBarText?: SortOrder
     showAnnouncementBar?: SortOrder
     socialLinksJson?: SortOrder

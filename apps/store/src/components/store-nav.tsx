@@ -143,11 +143,11 @@ export function StoreNav({ theme }: { theme?: any }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-3">
-          <div className="bg-white p-1 rounded-lg border border-slate-200/80 shadow-xs flex-shrink-0">
+          <div className="bg-white p-1 rounded-lg border border-slate-200/80 shadow-xs flex-shrink-0 flex items-center justify-center">
             <img
-              src="/avro-logo.png"
-              alt="AVROCART by TECHNEXT"
-              className="h-8 w-auto object-contain"
+              src={theme?.logoUrl || "/avro-logo.png"}
+              alt={brandName}
+              className="h-8 max-w-[140px] w-auto object-contain"
             />
           </div>
           <div>

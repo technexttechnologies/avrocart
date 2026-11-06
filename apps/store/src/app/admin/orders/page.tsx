@@ -25,6 +25,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import ShippingLabelModal, { ShippingLabelOrder } from "@/components/admin/shipping-label-modal";
+import TaxInvoiceModal from "@/components/admin/tax-invoice-modal";
 
 export default function OrdersAdminPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -663,100 +664,12 @@ export default function OrdersAdminPage() {
         />
       )}
 
-      {/* Tax Invoice Modal */}
+      {/* Minimal & Professional Tax Invoice Modal */}
       {showInvoiceModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto font-sans">
-            <div className="flex items-center justify-between border-b pb-4">
-              <div>
-                <span className="font-extrabold text-2xl text-[#0A192F] tracking-tight">TAX INVOICE</span>
-                <p className="text-xs text-slate-400">AVRO Retail Solutions | GST Compliant Tax Document</p>
-              </div>
-              <button
-                onClick={() => setShowInvoiceModal(null)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 text-xs">
-              <div>
-                <span className="text-slate-400 block font-semibold">Billed To:</span>
-                <strong className="text-slate-900 text-sm block mt-0.5">{showInvoiceModal.customerName}</strong>
-                <p className="text-slate-600 mt-1">{showInvoiceModal.customerEmail}</p>
-                <p className="text-slate-600">{showInvoiceModal.customerPhone}</p>
-              </div>
-              <div className="text-right">
-                <span className="text-slate-400 block font-semibold">Invoice Details:</span>
-                <strong className="text-slate-900 block font-mono text-sm mt-0.5">Invoice #{showInvoiceModal.orderNumber}</strong>
-                <span className="text-slate-600 block">Date: {new Date(showInvoiceModal.createdAt).toLocaleDateString()}</span>
-                <span className="text-slate-600 block">Payment: {showInvoiceModal.paymentMethod} ({showInvoiceModal.paymentStatus})</span>
-              </div>
-            </div>
-
-            {/* Table of items */}
-            <table className="w-full text-left text-xs border border-slate-200 rounded-xl overflow-hidden">
-              <thead className="bg-slate-50 border-b">
-                <tr>
-                  <th className="p-3">Item Description</th>
-                  <th className="p-3">Qty</th>
-                  <th className="p-3">Unit Price</th>
-                  <th className="p-3 text-right">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {showInvoiceModal.items?.map((it: any) => (
-                  <tr key={it.id}>
-                    <td className="p-3">
-                      <strong>{it.title}</strong>
-                      {it.variantTitle && <span className="text-slate-500 block text-[11px]">{it.variantTitle}</span>}
-                    </td>
-                    <td className="p-3 font-semibold">{it.quantity}</td>
-                    <td className="p-3">₹{it.price.toLocaleString("en-IN")}</td>
-                    <td className="p-3 text-right font-extrabold">₹{it.total.toLocaleString("en-IN")}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {/* Totals */}
-            <div className="flex justify-end text-xs">
-              <div className="w-56 space-y-1.5">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Subtotal:</span>
-                  <strong className="text-slate-800">₹{showInvoiceModal.subtotal.toLocaleString("en-IN")}</strong>
-                </div>
-                {showInvoiceModal.discount > 0 && (
-                  <div className="flex justify-between text-emerald-600">
-                    <span>Discount:</span>
-                    <strong>-₹{showInvoiceModal.discount.toLocaleString("en-IN")}</strong>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Shipping Fee:</span>
-                  <strong className="text-slate-800">₹{showInvoiceModal.shippingFee}</strong>
-                </div>
-                <div className="flex justify-between border-t pt-2 text-base font-extrabold text-[#0A192F]">
-                  <span>Total Amount:</span>
-                  <span>₹{showInvoiceModal.total.toLocaleString("en-IN")}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center pt-4 border-t">
-              <span className="text-[10px] text-slate-400">Powered by AVRO Self-Hosted E-Commerce Platform</span>
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="px-5 py-2.5 bg-[#0A192F] hover:bg-[#1E293B] text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-md transition-all"
-              >
-                <Printer className="w-4 h-4 text-emerald-400" />
-                Print Tax Invoice
-              </button>
-            </div>
-          </div>
-        </div>
+        <TaxInvoiceModal
+          order={showInvoiceModal}
+          onClose={() => setShowInvoiceModal(null)}
+        />
       )}
     </div>
   );

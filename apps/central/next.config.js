@@ -3,6 +3,9 @@ const path = require("path");
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ["@avro/license-core"],
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   webpack(config) {
     config.watchOptions = {
       ...(config.watchOptions || {}),

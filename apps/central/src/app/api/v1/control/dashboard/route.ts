@@ -117,10 +117,10 @@ export async function GET() {
     // Customization Quotes summary
     const quotes = await prisma.customizationQuote.findMany();
     const quotesTotal = quotes.length;
-    const quotesPending = quotes.filter((q) => q.status === "PENDING_REVIEW").length;
+    const quotesPending = quotes.filter((q) => q.status === "SENT" || q.status === "DRAFT" || q.status === "PENDING_REVIEW").length;
     const quotesPipelineValue = quotes
       .filter((q) => q.status !== "REJECTED")
-      .reduce((sum, q) => sum + q.totalEstimatedPrice, 0);
+      .reduce((sum, q) => sum + (q.quotedAmount || 0), 0);
 
     // Broadcasts summary
     const activeBroadcasts = await prisma.systemBroadcast.findMany({

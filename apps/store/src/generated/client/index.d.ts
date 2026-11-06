@@ -108,6 +108,11 @@ export type ShippingProviderSetting = $Result.DefaultSelection<Prisma.$ShippingP
  * 
  */
 export type StoreThemeSetting = $Result.DefaultSelection<Prisma.$StoreThemeSettingPayload>
+/**
+ * Model CustomPage
+ * 
+ */
+export type CustomPage = $Result.DefaultSelection<Prisma.$CustomPagePayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -421,6 +426,16 @@ export class PrismaClient<
     * ```
     */
   get storeThemeSetting(): Prisma.StoreThemeSettingDelegate<ExtArgs>;
+
+  /**
+   * `prisma.customPage`: Exposes CRUD operations for the **CustomPage** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CustomPages
+    * const customPages = await prisma.customPage.findMany()
+    * ```
+    */
+  get customPage(): Prisma.CustomPageDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -880,7 +895,8 @@ export namespace Prisma {
     Coupon: 'Coupon',
     PaymentGatewaySetting: 'PaymentGatewaySetting',
     ShippingProviderSetting: 'ShippingProviderSetting',
-    StoreThemeSetting: 'StoreThemeSetting'
+    StoreThemeSetting: 'StoreThemeSetting',
+    CustomPage: 'CustomPage'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -896,7 +912,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "storeAdmin" | "storeSetting" | "licenseCache" | "category" | "product" | "mediaAsset" | "productReview" | "productImage" | "productVariant" | "inventoryLog" | "storeCustomer" | "wishlistItem" | "address" | "order" | "orderItem" | "coupon" | "paymentGatewaySetting" | "shippingProviderSetting" | "storeThemeSetting"
+      modelProps: "storeAdmin" | "storeSetting" | "licenseCache" | "category" | "product" | "mediaAsset" | "productReview" | "productImage" | "productVariant" | "inventoryLog" | "storeCustomer" | "wishlistItem" | "address" | "order" | "orderItem" | "coupon" | "paymentGatewaySetting" | "shippingProviderSetting" | "storeThemeSetting" | "customPage"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2227,6 +2243,76 @@ export namespace Prisma {
           count: {
             args: Prisma.StoreThemeSettingCountArgs<ExtArgs>
             result: $Utils.Optional<StoreThemeSettingCountAggregateOutputType> | number
+          }
+        }
+      }
+      CustomPage: {
+        payload: Prisma.$CustomPagePayload<ExtArgs>
+        fields: Prisma.CustomPageFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CustomPageFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomPagePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CustomPageFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomPagePayload>
+          }
+          findFirst: {
+            args: Prisma.CustomPageFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomPagePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CustomPageFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomPagePayload>
+          }
+          findMany: {
+            args: Prisma.CustomPageFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomPagePayload>[]
+          }
+          create: {
+            args: Prisma.CustomPageCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomPagePayload>
+          }
+          createMany: {
+            args: Prisma.CustomPageCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CustomPageCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomPagePayload>[]
+          }
+          delete: {
+            args: Prisma.CustomPageDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomPagePayload>
+          }
+          update: {
+            args: Prisma.CustomPageUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomPagePayload>
+          }
+          deleteMany: {
+            args: Prisma.CustomPageDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CustomPageUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.CustomPageUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomPagePayload>
+          }
+          aggregate: {
+            args: Prisma.CustomPageAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCustomPage>
+          }
+          groupBy: {
+            args: Prisma.CustomPageGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CustomPageGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CustomPageCountArgs<ExtArgs>
+            result: $Utils.Optional<CustomPageCountAggregateOutputType> | number
           }
         }
       }
@@ -22043,6 +22129,956 @@ export namespace Prisma {
 
 
   /**
+   * Model CustomPage
+   */
+
+  export type AggregateCustomPage = {
+    _count: CustomPageCountAggregateOutputType | null
+    _min: CustomPageMinAggregateOutputType | null
+    _max: CustomPageMaxAggregateOutputType | null
+  }
+
+  export type CustomPageMinAggregateOutputType = {
+    id: string | null
+    title: string | null
+    slug: string | null
+    content: string | null
+    metaTitle: string | null
+    metaDescription: string | null
+    status: string | null
+    showInFooter: boolean | null
+    showInNav: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CustomPageMaxAggregateOutputType = {
+    id: string | null
+    title: string | null
+    slug: string | null
+    content: string | null
+    metaTitle: string | null
+    metaDescription: string | null
+    status: string | null
+    showInFooter: boolean | null
+    showInNav: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CustomPageCountAggregateOutputType = {
+    id: number
+    title: number
+    slug: number
+    content: number
+    metaTitle: number
+    metaDescription: number
+    status: number
+    showInFooter: number
+    showInNav: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type CustomPageMinAggregateInputType = {
+    id?: true
+    title?: true
+    slug?: true
+    content?: true
+    metaTitle?: true
+    metaDescription?: true
+    status?: true
+    showInFooter?: true
+    showInNav?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CustomPageMaxAggregateInputType = {
+    id?: true
+    title?: true
+    slug?: true
+    content?: true
+    metaTitle?: true
+    metaDescription?: true
+    status?: true
+    showInFooter?: true
+    showInNav?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CustomPageCountAggregateInputType = {
+    id?: true
+    title?: true
+    slug?: true
+    content?: true
+    metaTitle?: true
+    metaDescription?: true
+    status?: true
+    showInFooter?: true
+    showInNav?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type CustomPageAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CustomPage to aggregate.
+     */
+    where?: CustomPageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CustomPages to fetch.
+     */
+    orderBy?: CustomPageOrderByWithRelationInput | CustomPageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CustomPageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CustomPages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CustomPages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CustomPages
+    **/
+    _count?: true | CustomPageCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CustomPageMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CustomPageMaxAggregateInputType
+  }
+
+  export type GetCustomPageAggregateType<T extends CustomPageAggregateArgs> = {
+        [P in keyof T & keyof AggregateCustomPage]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCustomPage[P]>
+      : GetScalarType<T[P], AggregateCustomPage[P]>
+  }
+
+
+
+
+  export type CustomPageGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CustomPageWhereInput
+    orderBy?: CustomPageOrderByWithAggregationInput | CustomPageOrderByWithAggregationInput[]
+    by: CustomPageScalarFieldEnum[] | CustomPageScalarFieldEnum
+    having?: CustomPageScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CustomPageCountAggregateInputType | true
+    _min?: CustomPageMinAggregateInputType
+    _max?: CustomPageMaxAggregateInputType
+  }
+
+  export type CustomPageGroupByOutputType = {
+    id: string
+    title: string
+    slug: string
+    content: string
+    metaTitle: string | null
+    metaDescription: string | null
+    status: string
+    showInFooter: boolean
+    showInNav: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: CustomPageCountAggregateOutputType | null
+    _min: CustomPageMinAggregateOutputType | null
+    _max: CustomPageMaxAggregateOutputType | null
+  }
+
+  type GetCustomPageGroupByPayload<T extends CustomPageGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CustomPageGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CustomPageGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CustomPageGroupByOutputType[P]>
+            : GetScalarType<T[P], CustomPageGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CustomPageSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    title?: boolean
+    slug?: boolean
+    content?: boolean
+    metaTitle?: boolean
+    metaDescription?: boolean
+    status?: boolean
+    showInFooter?: boolean
+    showInNav?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["customPage"]>
+
+  export type CustomPageSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    title?: boolean
+    slug?: boolean
+    content?: boolean
+    metaTitle?: boolean
+    metaDescription?: boolean
+    status?: boolean
+    showInFooter?: boolean
+    showInNav?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["customPage"]>
+
+  export type CustomPageSelectScalar = {
+    id?: boolean
+    title?: boolean
+    slug?: boolean
+    content?: boolean
+    metaTitle?: boolean
+    metaDescription?: boolean
+    status?: boolean
+    showInFooter?: boolean
+    showInNav?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+
+  export type $CustomPagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CustomPage"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      title: string
+      slug: string
+      content: string
+      metaTitle: string | null
+      metaDescription: string | null
+      status: string
+      showInFooter: boolean
+      showInNav: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["customPage"]>
+    composites: {}
+  }
+
+  type CustomPageGetPayload<S extends boolean | null | undefined | CustomPageDefaultArgs> = $Result.GetResult<Prisma.$CustomPagePayload, S>
+
+  type CustomPageCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<CustomPageFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: CustomPageCountAggregateInputType | true
+    }
+
+  export interface CustomPageDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CustomPage'], meta: { name: 'CustomPage' } }
+    /**
+     * Find zero or one CustomPage that matches the filter.
+     * @param {CustomPageFindUniqueArgs} args - Arguments to find a CustomPage
+     * @example
+     * // Get one CustomPage
+     * const customPage = await prisma.customPage.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CustomPageFindUniqueArgs>(args: SelectSubset<T, CustomPageFindUniqueArgs<ExtArgs>>): Prisma__CustomPageClient<$Result.GetResult<Prisma.$CustomPagePayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one CustomPage that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {CustomPageFindUniqueOrThrowArgs} args - Arguments to find a CustomPage
+     * @example
+     * // Get one CustomPage
+     * const customPage = await prisma.customPage.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CustomPageFindUniqueOrThrowArgs>(args: SelectSubset<T, CustomPageFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CustomPageClient<$Result.GetResult<Prisma.$CustomPagePayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first CustomPage that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CustomPageFindFirstArgs} args - Arguments to find a CustomPage
+     * @example
+     * // Get one CustomPage
+     * const customPage = await prisma.customPage.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CustomPageFindFirstArgs>(args?: SelectSubset<T, CustomPageFindFirstArgs<ExtArgs>>): Prisma__CustomPageClient<$Result.GetResult<Prisma.$CustomPagePayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first CustomPage that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CustomPageFindFirstOrThrowArgs} args - Arguments to find a CustomPage
+     * @example
+     * // Get one CustomPage
+     * const customPage = await prisma.customPage.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CustomPageFindFirstOrThrowArgs>(args?: SelectSubset<T, CustomPageFindFirstOrThrowArgs<ExtArgs>>): Prisma__CustomPageClient<$Result.GetResult<Prisma.$CustomPagePayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more CustomPages that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CustomPageFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CustomPages
+     * const customPages = await prisma.customPage.findMany()
+     * 
+     * // Get first 10 CustomPages
+     * const customPages = await prisma.customPage.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const customPageWithIdOnly = await prisma.customPage.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CustomPageFindManyArgs>(args?: SelectSubset<T, CustomPageFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CustomPagePayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a CustomPage.
+     * @param {CustomPageCreateArgs} args - Arguments to create a CustomPage.
+     * @example
+     * // Create one CustomPage
+     * const CustomPage = await prisma.customPage.create({
+     *   data: {
+     *     // ... data to create a CustomPage
+     *   }
+     * })
+     * 
+     */
+    create<T extends CustomPageCreateArgs>(args: SelectSubset<T, CustomPageCreateArgs<ExtArgs>>): Prisma__CustomPageClient<$Result.GetResult<Prisma.$CustomPagePayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many CustomPages.
+     * @param {CustomPageCreateManyArgs} args - Arguments to create many CustomPages.
+     * @example
+     * // Create many CustomPages
+     * const customPage = await prisma.customPage.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CustomPageCreateManyArgs>(args?: SelectSubset<T, CustomPageCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CustomPages and returns the data saved in the database.
+     * @param {CustomPageCreateManyAndReturnArgs} args - Arguments to create many CustomPages.
+     * @example
+     * // Create many CustomPages
+     * const customPage = await prisma.customPage.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CustomPages and only return the `id`
+     * const customPageWithIdOnly = await prisma.customPage.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CustomPageCreateManyAndReturnArgs>(args?: SelectSubset<T, CustomPageCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CustomPagePayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a CustomPage.
+     * @param {CustomPageDeleteArgs} args - Arguments to delete one CustomPage.
+     * @example
+     * // Delete one CustomPage
+     * const CustomPage = await prisma.customPage.delete({
+     *   where: {
+     *     // ... filter to delete one CustomPage
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CustomPageDeleteArgs>(args: SelectSubset<T, CustomPageDeleteArgs<ExtArgs>>): Prisma__CustomPageClient<$Result.GetResult<Prisma.$CustomPagePayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one CustomPage.
+     * @param {CustomPageUpdateArgs} args - Arguments to update one CustomPage.
+     * @example
+     * // Update one CustomPage
+     * const customPage = await prisma.customPage.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CustomPageUpdateArgs>(args: SelectSubset<T, CustomPageUpdateArgs<ExtArgs>>): Prisma__CustomPageClient<$Result.GetResult<Prisma.$CustomPagePayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more CustomPages.
+     * @param {CustomPageDeleteManyArgs} args - Arguments to filter CustomPages to delete.
+     * @example
+     * // Delete a few CustomPages
+     * const { count } = await prisma.customPage.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CustomPageDeleteManyArgs>(args?: SelectSubset<T, CustomPageDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CustomPages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CustomPageUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CustomPages
+     * const customPage = await prisma.customPage.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CustomPageUpdateManyArgs>(args: SelectSubset<T, CustomPageUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one CustomPage.
+     * @param {CustomPageUpsertArgs} args - Arguments to update or create a CustomPage.
+     * @example
+     * // Update or create a CustomPage
+     * const customPage = await prisma.customPage.upsert({
+     *   create: {
+     *     // ... data to create a CustomPage
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CustomPage we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CustomPageUpsertArgs>(args: SelectSubset<T, CustomPageUpsertArgs<ExtArgs>>): Prisma__CustomPageClient<$Result.GetResult<Prisma.$CustomPagePayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of CustomPages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CustomPageCountArgs} args - Arguments to filter CustomPages to count.
+     * @example
+     * // Count the number of CustomPages
+     * const count = await prisma.customPage.count({
+     *   where: {
+     *     // ... the filter for the CustomPages we want to count
+     *   }
+     * })
+    **/
+    count<T extends CustomPageCountArgs>(
+      args?: Subset<T, CustomPageCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CustomPageCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CustomPage.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CustomPageAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CustomPageAggregateArgs>(args: Subset<T, CustomPageAggregateArgs>): Prisma.PrismaPromise<GetCustomPageAggregateType<T>>
+
+    /**
+     * Group by CustomPage.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CustomPageGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CustomPageGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CustomPageGroupByArgs['orderBy'] }
+        : { orderBy?: CustomPageGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CustomPageGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCustomPageGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CustomPage model
+   */
+  readonly fields: CustomPageFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CustomPage.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CustomPageClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CustomPage model
+   */ 
+  interface CustomPageFieldRefs {
+    readonly id: FieldRef<"CustomPage", 'String'>
+    readonly title: FieldRef<"CustomPage", 'String'>
+    readonly slug: FieldRef<"CustomPage", 'String'>
+    readonly content: FieldRef<"CustomPage", 'String'>
+    readonly metaTitle: FieldRef<"CustomPage", 'String'>
+    readonly metaDescription: FieldRef<"CustomPage", 'String'>
+    readonly status: FieldRef<"CustomPage", 'String'>
+    readonly showInFooter: FieldRef<"CustomPage", 'Boolean'>
+    readonly showInNav: FieldRef<"CustomPage", 'Boolean'>
+    readonly createdAt: FieldRef<"CustomPage", 'DateTime'>
+    readonly updatedAt: FieldRef<"CustomPage", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CustomPage findUnique
+   */
+  export type CustomPageFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomPage
+     */
+    select?: CustomPageSelect<ExtArgs> | null
+    /**
+     * Filter, which CustomPage to fetch.
+     */
+    where: CustomPageWhereUniqueInput
+  }
+
+  /**
+   * CustomPage findUniqueOrThrow
+   */
+  export type CustomPageFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomPage
+     */
+    select?: CustomPageSelect<ExtArgs> | null
+    /**
+     * Filter, which CustomPage to fetch.
+     */
+    where: CustomPageWhereUniqueInput
+  }
+
+  /**
+   * CustomPage findFirst
+   */
+  export type CustomPageFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomPage
+     */
+    select?: CustomPageSelect<ExtArgs> | null
+    /**
+     * Filter, which CustomPage to fetch.
+     */
+    where?: CustomPageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CustomPages to fetch.
+     */
+    orderBy?: CustomPageOrderByWithRelationInput | CustomPageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CustomPages.
+     */
+    cursor?: CustomPageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CustomPages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CustomPages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CustomPages.
+     */
+    distinct?: CustomPageScalarFieldEnum | CustomPageScalarFieldEnum[]
+  }
+
+  /**
+   * CustomPage findFirstOrThrow
+   */
+  export type CustomPageFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomPage
+     */
+    select?: CustomPageSelect<ExtArgs> | null
+    /**
+     * Filter, which CustomPage to fetch.
+     */
+    where?: CustomPageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CustomPages to fetch.
+     */
+    orderBy?: CustomPageOrderByWithRelationInput | CustomPageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CustomPages.
+     */
+    cursor?: CustomPageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CustomPages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CustomPages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CustomPages.
+     */
+    distinct?: CustomPageScalarFieldEnum | CustomPageScalarFieldEnum[]
+  }
+
+  /**
+   * CustomPage findMany
+   */
+  export type CustomPageFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomPage
+     */
+    select?: CustomPageSelect<ExtArgs> | null
+    /**
+     * Filter, which CustomPages to fetch.
+     */
+    where?: CustomPageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CustomPages to fetch.
+     */
+    orderBy?: CustomPageOrderByWithRelationInput | CustomPageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CustomPages.
+     */
+    cursor?: CustomPageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CustomPages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CustomPages.
+     */
+    skip?: number
+    distinct?: CustomPageScalarFieldEnum | CustomPageScalarFieldEnum[]
+  }
+
+  /**
+   * CustomPage create
+   */
+  export type CustomPageCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomPage
+     */
+    select?: CustomPageSelect<ExtArgs> | null
+    /**
+     * The data needed to create a CustomPage.
+     */
+    data: XOR<CustomPageCreateInput, CustomPageUncheckedCreateInput>
+  }
+
+  /**
+   * CustomPage createMany
+   */
+  export type CustomPageCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CustomPages.
+     */
+    data: CustomPageCreateManyInput | CustomPageCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CustomPage createManyAndReturn
+   */
+  export type CustomPageCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomPage
+     */
+    select?: CustomPageSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many CustomPages.
+     */
+    data: CustomPageCreateManyInput | CustomPageCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CustomPage update
+   */
+  export type CustomPageUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomPage
+     */
+    select?: CustomPageSelect<ExtArgs> | null
+    /**
+     * The data needed to update a CustomPage.
+     */
+    data: XOR<CustomPageUpdateInput, CustomPageUncheckedUpdateInput>
+    /**
+     * Choose, which CustomPage to update.
+     */
+    where: CustomPageWhereUniqueInput
+  }
+
+  /**
+   * CustomPage updateMany
+   */
+  export type CustomPageUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CustomPages.
+     */
+    data: XOR<CustomPageUpdateManyMutationInput, CustomPageUncheckedUpdateManyInput>
+    /**
+     * Filter which CustomPages to update
+     */
+    where?: CustomPageWhereInput
+  }
+
+  /**
+   * CustomPage upsert
+   */
+  export type CustomPageUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomPage
+     */
+    select?: CustomPageSelect<ExtArgs> | null
+    /**
+     * The filter to search for the CustomPage to update in case it exists.
+     */
+    where: CustomPageWhereUniqueInput
+    /**
+     * In case the CustomPage found by the `where` argument doesn't exist, create a new CustomPage with this data.
+     */
+    create: XOR<CustomPageCreateInput, CustomPageUncheckedCreateInput>
+    /**
+     * In case the CustomPage was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CustomPageUpdateInput, CustomPageUncheckedUpdateInput>
+  }
+
+  /**
+   * CustomPage delete
+   */
+  export type CustomPageDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomPage
+     */
+    select?: CustomPageSelect<ExtArgs> | null
+    /**
+     * Filter which CustomPage to delete.
+     */
+    where: CustomPageWhereUniqueInput
+  }
+
+  /**
+   * CustomPage deleteMany
+   */
+  export type CustomPageDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CustomPages to delete
+     */
+    where?: CustomPageWhereInput
+  }
+
+  /**
+   * CustomPage without action
+   */
+  export type CustomPageDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomPage
+     */
+    select?: CustomPageSelect<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -22383,6 +23419,23 @@ export namespace Prisma {
   };
 
   export type StoreThemeSettingScalarFieldEnum = (typeof StoreThemeSettingScalarFieldEnum)[keyof typeof StoreThemeSettingScalarFieldEnum]
+
+
+  export const CustomPageScalarFieldEnum: {
+    id: 'id',
+    title: 'title',
+    slug: 'slug',
+    content: 'content',
+    metaTitle: 'metaTitle',
+    metaDescription: 'metaDescription',
+    status: 'status',
+    showInFooter: 'showInFooter',
+    showInNav: 'showInNav',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type CustomPageScalarFieldEnum = (typeof CustomPageScalarFieldEnum)[keyof typeof CustomPageScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -24152,6 +25205,88 @@ export namespace Prisma {
     socialLinksJson?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
     footerText?: StringNullableWithAggregatesFilter<"StoreThemeSetting"> | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"StoreThemeSetting"> | Date | string
+  }
+
+  export type CustomPageWhereInput = {
+    AND?: CustomPageWhereInput | CustomPageWhereInput[]
+    OR?: CustomPageWhereInput[]
+    NOT?: CustomPageWhereInput | CustomPageWhereInput[]
+    id?: StringFilter<"CustomPage"> | string
+    title?: StringFilter<"CustomPage"> | string
+    slug?: StringFilter<"CustomPage"> | string
+    content?: StringFilter<"CustomPage"> | string
+    metaTitle?: StringNullableFilter<"CustomPage"> | string | null
+    metaDescription?: StringNullableFilter<"CustomPage"> | string | null
+    status?: StringFilter<"CustomPage"> | string
+    showInFooter?: BoolFilter<"CustomPage"> | boolean
+    showInNav?: BoolFilter<"CustomPage"> | boolean
+    createdAt?: DateTimeFilter<"CustomPage"> | Date | string
+    updatedAt?: DateTimeFilter<"CustomPage"> | Date | string
+  }
+
+  export type CustomPageOrderByWithRelationInput = {
+    id?: SortOrder
+    title?: SortOrder
+    slug?: SortOrder
+    content?: SortOrder
+    metaTitle?: SortOrderInput | SortOrder
+    metaDescription?: SortOrderInput | SortOrder
+    status?: SortOrder
+    showInFooter?: SortOrder
+    showInNav?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CustomPageWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    slug?: string
+    AND?: CustomPageWhereInput | CustomPageWhereInput[]
+    OR?: CustomPageWhereInput[]
+    NOT?: CustomPageWhereInput | CustomPageWhereInput[]
+    title?: StringFilter<"CustomPage"> | string
+    content?: StringFilter<"CustomPage"> | string
+    metaTitle?: StringNullableFilter<"CustomPage"> | string | null
+    metaDescription?: StringNullableFilter<"CustomPage"> | string | null
+    status?: StringFilter<"CustomPage"> | string
+    showInFooter?: BoolFilter<"CustomPage"> | boolean
+    showInNav?: BoolFilter<"CustomPage"> | boolean
+    createdAt?: DateTimeFilter<"CustomPage"> | Date | string
+    updatedAt?: DateTimeFilter<"CustomPage"> | Date | string
+  }, "id" | "slug">
+
+  export type CustomPageOrderByWithAggregationInput = {
+    id?: SortOrder
+    title?: SortOrder
+    slug?: SortOrder
+    content?: SortOrder
+    metaTitle?: SortOrderInput | SortOrder
+    metaDescription?: SortOrderInput | SortOrder
+    status?: SortOrder
+    showInFooter?: SortOrder
+    showInNav?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: CustomPageCountOrderByAggregateInput
+    _max?: CustomPageMaxOrderByAggregateInput
+    _min?: CustomPageMinOrderByAggregateInput
+  }
+
+  export type CustomPageScalarWhereWithAggregatesInput = {
+    AND?: CustomPageScalarWhereWithAggregatesInput | CustomPageScalarWhereWithAggregatesInput[]
+    OR?: CustomPageScalarWhereWithAggregatesInput[]
+    NOT?: CustomPageScalarWhereWithAggregatesInput | CustomPageScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CustomPage"> | string
+    title?: StringWithAggregatesFilter<"CustomPage"> | string
+    slug?: StringWithAggregatesFilter<"CustomPage"> | string
+    content?: StringWithAggregatesFilter<"CustomPage"> | string
+    metaTitle?: StringNullableWithAggregatesFilter<"CustomPage"> | string | null
+    metaDescription?: StringNullableWithAggregatesFilter<"CustomPage"> | string | null
+    status?: StringWithAggregatesFilter<"CustomPage"> | string
+    showInFooter?: BoolWithAggregatesFilter<"CustomPage"> | boolean
+    showInNav?: BoolWithAggregatesFilter<"CustomPage"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"CustomPage"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"CustomPage"> | Date | string
   }
 
   export type StoreAdminCreateInput = {
@@ -26091,6 +27226,104 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type CustomPageCreateInput = {
+    id?: string
+    title: string
+    slug: string
+    content: string
+    metaTitle?: string | null
+    metaDescription?: string | null
+    status?: string
+    showInFooter?: boolean
+    showInNav?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CustomPageUncheckedCreateInput = {
+    id?: string
+    title: string
+    slug: string
+    content: string
+    metaTitle?: string | null
+    metaDescription?: string | null
+    status?: string
+    showInFooter?: boolean
+    showInNav?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CustomPageUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    showInFooter?: BoolFieldUpdateOperationsInput | boolean
+    showInNav?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CustomPageUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    showInFooter?: BoolFieldUpdateOperationsInput | boolean
+    showInNav?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CustomPageCreateManyInput = {
+    id?: string
+    title: string
+    slug: string
+    content: string
+    metaTitle?: string | null
+    metaDescription?: string | null
+    status?: string
+    showInFooter?: boolean
+    showInNav?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CustomPageUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    showInFooter?: BoolFieldUpdateOperationsInput | boolean
+    showInNav?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CustomPageUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    showInFooter?: BoolFieldUpdateOperationsInput | boolean
+    showInNav?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -27372,6 +28605,48 @@ export namespace Prisma {
     showAnnouncementBar?: SortOrder
     socialLinksJson?: SortOrder
     footerText?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CustomPageCountOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    slug?: SortOrder
+    content?: SortOrder
+    metaTitle?: SortOrder
+    metaDescription?: SortOrder
+    status?: SortOrder
+    showInFooter?: SortOrder
+    showInNav?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CustomPageMaxOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    slug?: SortOrder
+    content?: SortOrder
+    metaTitle?: SortOrder
+    metaDescription?: SortOrder
+    status?: SortOrder
+    showInFooter?: SortOrder
+    showInNav?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CustomPageMinOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    slug?: SortOrder
+    content?: SortOrder
+    metaTitle?: SortOrder
+    metaDescription?: SortOrder
+    status?: SortOrder
+    showInFooter?: SortOrder
+    showInNav?: SortOrder
+    createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -30848,6 +32123,10 @@ export namespace Prisma {
      * @deprecated Use StoreThemeSettingDefaultArgs instead
      */
     export type StoreThemeSettingArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = StoreThemeSettingDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use CustomPageDefaultArgs instead
+     */
+    export type CustomPageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = CustomPageDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

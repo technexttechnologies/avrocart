@@ -32,6 +32,7 @@ import {
   PackagePlus,
   UploadCloud,
   BookOpen,
+  FileText,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -156,6 +157,7 @@ export default function StoreAdminLayout({
   ];
 
   const navGrowth = [
+    { label: "Pages & Content", href: "/admin/pages", icon: FileText },
     { label: "Coupons & Discounts", href: "/admin/coupons", icon: Tag },
     { label: "Media & Asset Library", href: "/admin/media", icon: UploadCloud },
     { label: "Sales Reports", href: "/admin/reports", icon: BarChart3 },

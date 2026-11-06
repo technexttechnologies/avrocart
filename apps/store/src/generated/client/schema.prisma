@@ -302,6 +302,20 @@ model StoreThemeSetting {
   announcementBarText String?  @default("Free Shipping on Orders Over ₹999")
   showAnnouncementBar Boolean  @default(true)
   socialLinksJson     String?  @default("{\"facebook\":\"https://facebook.com\",\"instagram\":\"https://instagram.com\",\"twitter\":\"https://twitter.com\"}")
-  footerText          String?  @default("© 2026 AVRO Store. Powered by AVRO by TECHNEXT.")
+  footerText          String?  @default("© 2026 AVRO Store. Powered by AVRO.")
   updatedAt           DateTime @default(now()) @updatedAt
+}
+
+model CustomPage {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  content         String // HTML or Markdown body
+  metaTitle       String?
+  metaDescription String?
+  status          String   @default("PUBLISHED") // PUBLISHED, DRAFT
+  showInFooter    Boolean  @default(true)
+  showInNav       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

@@ -394,6 +394,20 @@ exports.Prisma.StoreThemeSettingScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.CustomPageScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  slug: 'slug',
+  content: 'content',
+  metaTitle: 'metaTitle',
+  metaDescription: 'metaDescription',
+  status: 'status',
+  showInFooter: 'showInFooter',
+  showInNav: 'showInNav',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -429,7 +443,8 @@ exports.Prisma.ModelName = {
   Coupon: 'Coupon',
   PaymentGatewaySetting: 'PaymentGatewaySetting',
   ShippingProviderSetting: 'ShippingProviderSetting',
-  StoreThemeSetting: 'StoreThemeSetting'
+  StoreThemeSetting: 'StoreThemeSetting',
+  CustomPage: 'CustomPage'
 };
 
 /**

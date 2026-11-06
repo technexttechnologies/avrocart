@@ -23,6 +23,12 @@ import {
   Square,
   Send,
   SlidersHorizontal,
+  Plus,
+  Download,
+  Trash2,
+  Edit,
+  MapPin,
+  AlertCircle,
 } from "lucide-react";
 import ShippingLabelModal, { ShippingLabelOrder } from "@/components/admin/shipping-label-modal";
 import TaxInvoiceModal from "@/components/admin/tax-invoice-modal";
@@ -33,20 +39,74 @@ export default function OrdersAdminPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // Available catalog products for picking in order creation/editing
+  const [availableProducts, setAvailableProducts] = useState<any[]>([]);
+
   // Modals state
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
   const [showInvoiceModal, setShowInvoiceModal] = useState<any | null>(null);
   const [shippingLabelsToPrint, setShippingLabelsToPrint] = useState<ShippingLabelOrder[] | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [notification, setNotification] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Multi-select for batch actions
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
 
-  // Status and tracking update states
+  // Order Creation State
+  const [newCustomerName, setNewCustomerName] = useState("");
+  const [newCustomerEmail, setNewCustomerEmail] = useState("");
+  const [newCustomerPhone, setNewCustomerPhone] = useState("");
+  const [newAddressLine, setNewAddressLine] = useState("");
+  const [newCity, setNewCity] = useState("New Delhi");
+  const [newState, setNewState] = useState("Delhi");
+  const [newPincode, setNewPincode] = useState("110001");
+  const [newPaymentMethod, setNewPaymentMethod] = useState("COD");
+  const [newPaymentStatus, setNewPaymentStatus] = useState("PENDING");
+  const [newOrderStatus, setNewOrderStatus] = useState("CONFIRMED");
+  const [newCourier, setNewCourier] = useState("DELHIVERY");
+  const [newTracking, setNewTracking] = useState("");
+  const [newCustomerNotes, setNewCustomerNotes] = useState("");
+  const [newAdminNotes, setNewAdminNotes] = useState("");
+  const [newDiscount, setNewDiscount] = useState<number>(0);
+  const [newShippingFee, setNewShippingFee] = useState<number>(0);
+  const [newItems, setNewItems] = useState<
+    Array<{
+      productId: string;
+      variantId?: string;
+      title: string;
+      variantTitle?: string;
+      sku: string;
+      price: number;
+      quantity: number;
+    }>
+  >([]);
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+
+  // Order Editing State (for full edit modal)
+  const [editCustomerName, setEditCustomerName] = useState("");
+  const [editCustomerEmail, setEditCustomerEmail] = useState("");
+  const [editCustomerPhone, setEditCustomerPhone] = useState("");
+  const [editAddressLine, setEditAddressLine] = useState("");
+  const [editCity, setEditCity] = useState("");
+  const [editState, setEditState] = useState("");
+  const [editPincode, setEditPincode] = useState("");
   const [editStatus, setEditStatus] = useState("");
   const [editPaymentStatus, setEditPaymentStatus] = useState("");
-  const [editTracking, setEditTracking] = useState("");
+  const [editPaymentMethod, setEditPaymentMethod] = useState("");
   const [editCourier, setEditCourier] = useState("");
+  const [editTracking, setEditTracking] = useState("");
+  const [editDiscount, setEditDiscount] = useState<number>(0);
+  const [editShippingFee, setEditShippingFee] = useState<number>(0);
+  const [editAdminNotes, setEditAdminNotes] = useState("");
+  const [editCustomerNotes, setEditCustomerNotes] = useState("");
+  const [editItems, setEditItems] = useState<any[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const showToast = (text: string, type: "success" | "error" = "success") => {
+    setNotification({ type, text });
+    setTimeout(() => setNotification(null), 4000);
+  };
 
   const loadOrders = () => {
     setLoading(true);
@@ -61,11 +121,24 @@ export default function OrdersAdminPage() {
           }
         }
       })
+      .catch((err) => console.error("Error loading orders:", err))
       .finally(() => setLoading(false));
+  };
+
+  const loadProducts = () => {
+    fetch("/api/admin/products")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.products) {
+          setAvailableProducts(data.products);
+        }
+      })
+      .catch(() => {});
   };
 
   useEffect(() => {
     loadOrders();
+    loadProducts();
   }, [statusFilter]);
 
   // Filtered orders based on search query
@@ -96,36 +169,252 @@ export default function OrdersAdminPage() {
     [orders]
   );
 
+  // Quick detail drawer opener
   const handleOpenDetail = (order: any) => {
     setSelectedOrder(order);
-    setEditStatus(order.orderStatus);
-    setEditPaymentStatus(order.paymentStatus);
-    setEditTracking(order.trackingNumber || "");
-    setEditCourier(order.shippingProvider || "DELHIVERY");
+    populateEditState(order);
   };
 
+  // Populate edit fields from an order
+  const populateEditState = (order: any) => {
+    setEditCustomerName(order.customerName || "");
+    setEditCustomerEmail(order.customerEmail || "");
+    setEditCustomerPhone(order.customerPhone || "");
+    setEditStatus(order.orderStatus);
+    setEditPaymentStatus(order.paymentStatus);
+    setEditPaymentMethod(order.paymentMethod || "COD");
+    setEditCourier(order.shippingProvider || "DELHIVERY");
+    setEditTracking(order.trackingNumber || "");
+    setEditDiscount(order.discount || 0);
+    setEditShippingFee(order.shippingFee || 0);
+    setEditAdminNotes(order.adminNotes || "");
+    setEditCustomerNotes(order.customerNotes || "");
+    setEditItems(order.items ? JSON.parse(JSON.stringify(order.items)) : []);
+
+    let addr = { addressLine1: "", city: "", state: "", postalCode: "" };
+    if (order.shippingAddressJson) {
+      try {
+        addr = JSON.parse(order.shippingAddressJson);
+      } catch {}
+    }
+    setEditAddressLine(addr.addressLine1 || "");
+    setEditCity(addr.city || "");
+    setEditState(addr.state || "");
+    setEditPincode(addr.postalCode || "");
+  };
+
+  const handleOpenEditModal = (order: any) => {
+    populateEditState(order);
+    setSelectedOrder(order);
+    setShowEditModal(true);
+  };
+
+  // Open Create Order Modal
+  const handleOpenCreateModal = () => {
+    setNewCustomerName("");
+    setNewCustomerEmail("");
+    setNewCustomerPhone("");
+    setNewAddressLine("");
+    setNewCity("New Delhi");
+    setNewState("Delhi");
+    setNewPincode("110001");
+    setNewPaymentMethod("COD");
+    setNewPaymentStatus("PENDING");
+    setNewOrderStatus("CONFIRMED");
+    setNewCourier("DELHIVERY");
+    setNewTracking("");
+    setNewCustomerNotes("");
+    setNewAdminNotes("");
+    setNewDiscount(0);
+    setNewShippingFee(0);
+
+    // Initial placeholder item
+    if (availableProducts.length > 0) {
+      const p = availableProducts[0];
+      setNewItems([
+        {
+          productId: p.id,
+          title: p.title,
+          sku: p.sku || `SKU-${p.id.slice(-4)}`,
+          price: p.price,
+          quantity: 1,
+        },
+      ]);
+    } else {
+      setNewItems([
+        {
+          productId: "custom",
+          title: "Custom Item",
+          sku: "CUSTOM-01",
+          price: 999,
+          quantity: 1,
+        },
+      ]);
+    }
+
+    setShowCreateModal(true);
+  };
+
+  // Add Item to Create Order
+  const handleAddItemToCreate = () => {
+    if (availableProducts.length > 0) {
+      const p = availableProducts[0];
+      setNewItems((prev) => [
+        ...prev,
+        {
+          productId: p.id,
+          title: p.title,
+          sku: p.sku || `SKU-${Date.now().toString().slice(-4)}`,
+          price: p.price,
+          quantity: 1,
+        },
+      ]);
+    } else {
+      setNewItems((prev) => [
+        ...prev,
+        {
+          productId: "custom",
+          title: "Additional Item",
+          sku: `SKU-${Date.now().toString().slice(-4)}`,
+          price: 499,
+          quantity: 1,
+        },
+      ]);
+    }
+  };
+
+  // Save New Order
+  const handleCreateOrderSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCustomerName.trim() || !newCustomerPhone.trim()) {
+      showToast("Customer Name and Phone Number are required.", "error");
+      return;
+    }
+    if (newItems.length === 0) {
+      showToast("At least one line item is required.", "error");
+      return;
+    }
+
+    setIsSubmittingOrder(true);
+    try {
+      const calculatedSubtotal = newItems.reduce((acc, it) => acc + it.price * it.quantity, 0);
+      const calculatedTotal = Math.max(0, calculatedSubtotal - Number(newDiscount) + Number(newShippingFee));
+
+      const payload = {
+        customerName: newCustomerName,
+        customerEmail: newCustomerEmail || `${newCustomerPhone.replace(/[^0-9]/g, "")}@order.avrostore.com`,
+        customerPhone: newCustomerPhone,
+        shippingAddress: {
+          fullName: newCustomerName,
+          addressLine1: newAddressLine || "Express Delivery Address",
+          city: newCity || "New Delhi",
+          state: newState || "Delhi",
+          postalCode: newPincode || "110001",
+          country: "India",
+          phone: newCustomerPhone,
+        },
+        items: newItems,
+        subtotal: calculatedSubtotal,
+        discount: Number(newDiscount) || 0,
+        shippingFee: Number(newShippingFee) || 0,
+        total: calculatedTotal,
+        paymentMethod: newPaymentMethod,
+        paymentStatus: newPaymentStatus,
+        orderStatus: newOrderStatus,
+        shippingProvider: newCourier,
+        trackingNumber: newTracking || null,
+        customerNotes: newCustomerNotes || null,
+        adminNotes: newAdminNotes || null,
+      };
+
+      const res = await fetch("/api/admin/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Order #${data.order.orderNumber} created successfully!`);
+        setShowCreateModal(false);
+        loadOrders();
+      } else {
+        showToast(data.error || "Failed to create order.", "error");
+      }
+    } catch (err: any) {
+      showToast(err.message || "Network error", "error");
+    } finally {
+      setIsSubmittingOrder(false);
+    }
+  };
+
+  // Save Edited Order
   const handleUpdateOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedOrder) return;
     setIsUpdating(true);
 
     try {
-      await fetch("/api/admin/orders", {
+      const calculatedSubtotal = editItems.reduce((acc, it) => acc + it.price * it.quantity, 0);
+      const calculatedTotal = Math.max(0, calculatedSubtotal - Number(editDiscount) + Number(editShippingFee));
+
+      const res = await fetch("/api/admin/orders", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: selectedOrder.id,
+          customerName: editCustomerName,
+          customerEmail: editCustomerEmail,
+          customerPhone: editCustomerPhone,
+          shippingAddress: {
+            fullName: editCustomerName,
+            addressLine1: editAddressLine,
+            city: editCity,
+            state: editState,
+            postalCode: editPincode,
+            country: "India",
+            phone: editCustomerPhone,
+          },
           orderStatus: editStatus,
           paymentStatus: editPaymentStatus,
-          trackingNumber: editTracking,
+          paymentMethod: editPaymentMethod,
           shippingProvider: editCourier,
+          trackingNumber: editTracking,
+          subtotal: calculatedSubtotal,
+          discount: Number(editDiscount),
+          shippingFee: Number(editShippingFee),
+          total: calculatedTotal,
+          adminNotes: editAdminNotes,
+          customerNotes: editCustomerNotes,
+          items: editItems,
         }),
       });
 
-      loadOrders();
+      const data = await res.json();
+      if (data.success) {
+        showToast("Order updated successfully!");
+        setShowEditModal(false);
+        loadOrders();
+      } else {
+        showToast(data.error || "Failed to update order", "error");
+      }
+    } catch (err: any) {
+      showToast(err.message || "Network error", "error");
     } finally {
       setIsUpdating(false);
     }
+  };
+
+  // Download CSV export
+  const handleExportCsv = () => {
+    const url = `/api/admin/reports?format=csv&range=all`;
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `avro-orders-export-${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast("Downloading full orders CSV report...");
   };
 
   // Checkbox helpers
@@ -163,36 +452,78 @@ export default function OrdersAdminPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-sans">
       {/* Top Header & Overview */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-extrabold text-[#0A192F] tracking-tight">
-              Order Fulfillment & Shipping
+              Order Fulfillment & Management
             </h1>
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-[#2563EB] border border-blue-200">
               {filteredOrders.length} Orders
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Dispatch customer shipments, print thermal 4"×6" courier labels, generate GST tax invoices, and track parcel delivery.
+            Create manual orders, edit customer addresses, dispatch shipments, print thermal 4"×6" labels, and download CSV reports.
           </p>
         </div>
 
         {/* Global Action Buttons */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
           {selectedOrderIds.length > 0 && (
             <button
               onClick={handlePrintBatchLabels}
-              className="px-4 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5"
+              className="px-3.5 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5"
             >
               <Tag className="w-3.5 h-3.5" />
-              Print Shipping Labels ({selectedOrderIds.length})
+              Print Labels ({selectedOrderIds.length})
             </button>
           )}
+
+          <button
+            onClick={handleExportCsv}
+            className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+          >
+            <Download className="w-3.5 h-3.5 text-slate-500" />
+            Export CSV
+          </button>
+
+          <button
+            onClick={handleOpenCreateModal}
+            className="px-4 py-2 rounded-xl bg-[#0A192F] hover:bg-[#1E293B] text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5"
+          >
+            <Plus className="w-4 h-4" />
+            Create New Order
+          </button>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {notification && (
+        <div
+          className={`p-3.5 rounded-xl text-xs font-semibold flex items-center justify-between shadow-xs transition-all ${
+            notification.type === "success"
+              ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+              : "bg-rose-50 text-rose-800 border border-rose-200"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {notification.type === "success" ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+            )}
+            <span>{notification.text}</span>
+          </div>
+          <button
+            onClick={() => setNotification(null)}
+            className="text-xs font-bold opacity-60 hover:opacity-100 ml-4"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Metric KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -244,7 +575,7 @@ export default function OrdersAdminPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by Order #, Customer Name, Email, or AWB..."
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 transition-all"
+              className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs bg-slate-50/50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#2563EB]/20 transition-all"
             />
           </div>
 
@@ -296,7 +627,7 @@ export default function OrdersAdminPage() {
                 <th className="py-3.5 px-4 w-10">
                   <button
                     onClick={handleToggleSelectAll}
-                    className="p-1 rounded text-slate-400 hover:text-slate-700"
+                    className="p-1 rounded-sm text-slate-400 hover:text-slate-700"
                   >
                     {selectedOrderIds.length === filteredOrders.length && filteredOrders.length > 0 ? (
                       <CheckSquare className="w-4 h-4 text-[#2563EB]" />
@@ -330,7 +661,16 @@ export default function OrdersAdminPage() {
                   <td colSpan={9} className="text-center py-12 text-slate-400">
                     <Package className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                     <p className="font-semibold text-slate-600">No orders match this filter.</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">Try clearing your search query or selecting "All Orders".</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      Try clearing your search query or creating a new manual order.
+                    </p>
+                    <button
+                      onClick={handleOpenCreateModal}
+                      className="mt-3 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold rounded-xl transition-all shadow-xs inline-flex items-center gap-1.5"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Create Manual Order
+                    </button>
                   </td>
                 </tr>
               ) : (
@@ -346,7 +686,7 @@ export default function OrdersAdminPage() {
                       <td className="py-3.5 px-4">
                         <button
                           onClick={() => handleToggleSelectOne(ord.id)}
-                          className="p-1 rounded text-slate-400 hover:text-slate-700"
+                          className="p-1 rounded-sm text-slate-400 hover:text-slate-700"
                         >
                           {isChecked ? (
                             <CheckSquare className="w-4 h-4 text-[#2563EB]" />
@@ -397,7 +737,7 @@ export default function OrdersAdminPage() {
                           {ord.paymentMethod}
                         </span>
                         <span
-                          className={`text-[9px] font-extrabold tracking-wider px-1.5 py-0.5 rounded uppercase inline-block mt-0.5 ${
+                          className={`text-[9px] font-extrabold tracking-wider px-1.5 py-0.5 rounded-sm uppercase inline-block mt-0.5 ${
                             ord.paymentStatus === "PAID"
                               ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                               : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -435,6 +775,16 @@ export default function OrdersAdminPage() {
                         </span>
                       </td>
                       <td className="py-3.5 px-4 text-right space-x-1.5 whitespace-nowrap">
+                        {/* Edit Order Action */}
+                        <button
+                          onClick={() => handleOpenEditModal(ord)}
+                          className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-[#0A192F] hover:text-white text-slate-700 font-bold transition-all inline-flex items-center gap-1 shadow-2xs"
+                          title="Edit Order Details & Items"
+                        >
+                          <Edit className="w-3 h-3" />
+                          <span>Edit</span>
+                        </button>
+
                         {/* 4x6 Shipping Label Printing Action */}
                         <button
                           onClick={() => setShippingLabelsToPrint([ord])}
@@ -472,9 +822,602 @@ export default function OrdersAdminPage() {
         </div>
       </div>
 
-      {/* Order Details & Status Drawer Modal */}
-      {selectedOrder && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+      {/* CREATE ORDER MODAL */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-slate-200 max-w-3xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto font-sans animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-2xl bg-blue-50 text-[#2563EB] flex items-center justify-center">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-[#0A192F]">Create New Order</h3>
+                  <p className="text-xs text-slate-500">
+                    Manually create customer orders, select catalog products, and set fulfillment routing.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateOrderSubmit} className="space-y-6 text-xs">
+              {/* Customer Information */}
+              <div className="p-4 bg-slate-50/75 rounded-2xl border border-slate-200/80 space-y-3">
+                <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-2">
+                  <User className="w-3.5 h-3.5 text-[#2563EB]" />
+                  Customer Information
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Customer Name <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newCustomerName}
+                      onChange={(e) => setNewCustomerName(e.target.value)}
+                      placeholder="e.g. Rahul Sharma"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-[#2563EB]/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Phone Number <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newCustomerPhone}
+                      onChange={(e) => setNewCustomerPhone(e.target.value)}
+                      placeholder="e.g. +91 9876543210"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-[#2563EB]/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Email Address</label>
+                    <input
+                      type="email"
+                      value={newCustomerEmail}
+                      onChange={(e) => setNewCustomerEmail(e.target.value)}
+                      placeholder="rahul@example.com"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-[#2563EB]/20"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Delivery Address */}
+              <div className="p-4 bg-slate-50/75 rounded-2xl border border-slate-200/80 space-y-3">
+                <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-2">
+                  <MapPin className="w-3.5 h-3.5 text-[#2563EB]" />
+                  Shipping Destination
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                  <div className="sm:col-span-2">
+                    <label className="block font-bold text-slate-700 mb-1">Address Line</label>
+                    <input
+                      type="text"
+                      value={newAddressLine}
+                      onChange={(e) => setNewAddressLine(e.target.value)}
+                      placeholder="Flat / Street / Area"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">City</label>
+                    <input
+                      type="text"
+                      value={newCity}
+                      onChange={(e) => setNewCity(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Pincode</label>
+                    <input
+                      type="text"
+                      value={newPincode}
+                      onChange={(e) => setNewPincode(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-hidden"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Purchased Line Items */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-2">
+                    <ShoppingBag className="w-3.5 h-3.5 text-[#2563EB]" />
+                    Line Items ({newItems.length})
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={handleAddItemToCreate}
+                    className="px-3 py-1 rounded-xl bg-blue-50 text-[#2563EB] hover:bg-blue-100 font-bold flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Product Item
+                  </button>
+                </div>
+
+                <div className="border border-slate-200 rounded-2xl overflow-hidden divide-y divide-slate-100">
+                  {newItems.map((item, idx) => (
+                    <div key={idx} className="p-3 bg-white grid grid-cols-12 gap-2 items-center">
+                      <div className="col-span-5">
+                        <label className="text-[10px] text-slate-400 font-semibold block mb-0.5">Product</label>
+                        {availableProducts.length > 0 ? (
+                          <select
+                            value={item.productId}
+                            onChange={(e) => {
+                              const selProd = availableProducts.find((p) => p.id === e.target.value);
+                              const updated = [...newItems];
+                              if (selProd) {
+                                updated[idx].productId = selProd.id;
+                                updated[idx].title = selProd.title;
+                                updated[idx].price = selProd.price;
+                                updated[idx].sku = selProd.sku || `SKU-${selProd.id.slice(-4)}`;
+                              }
+                              setNewItems(updated);
+                            }}
+                            className="w-full px-2 py-1.5 border border-slate-200 rounded-lg font-medium text-xs bg-slate-50 focus:bg-white"
+                          >
+                            {availableProducts.map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.title} (₹{p.price})
+                              </option>
+                            ))}
+                            <option value="custom">Custom Line Item</option>
+                          </select>
+                        ) : (
+                          <input
+                            type="text"
+                            value={item.title}
+                            onChange={(e) => {
+                              const updated = [...newItems];
+                              updated[idx].title = e.target.value;
+                              setNewItems(updated);
+                            }}
+                            className="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-xs"
+                          />
+                        )}
+                      </div>
+
+                      <div className="col-span-2">
+                        <label className="text-[10px] text-slate-400 font-semibold block mb-0.5">Price (₹)</label>
+                        <input
+                          type="number"
+                          value={item.price}
+                          onChange={(e) => {
+                            const updated = [...newItems];
+                            updated[idx].price = Number(e.target.value) || 0;
+                            setNewItems(updated);
+                          }}
+                          className="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-xs"
+                        />
+                      </div>
+
+                      <div className="col-span-2">
+                        <label className="text-[10px] text-slate-400 font-semibold block mb-0.5">Qty</label>
+                        <input
+                          type="number"
+                          min={1}
+                          value={item.quantity}
+                          onChange={(e) => {
+                            const updated = [...newItems];
+                            updated[idx].quantity = Math.max(1, Number(e.target.value) || 1);
+                            setNewItems(updated);
+                          }}
+                          className="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-xs"
+                        />
+                      </div>
+
+                      <div className="col-span-2 text-right">
+                        <label className="text-[10px] text-slate-400 font-semibold block mb-0.5">Line Total</label>
+                        <span className="font-extrabold text-[#0A192F]">
+                          ₹{(item.price * item.quantity).toLocaleString("en-IN")}
+                        </span>
+                      </div>
+
+                      <div className="col-span-1 text-right pt-4">
+                        {newItems.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => setNewItems(newItems.filter((_, i) => i !== idx))}
+                            className="p-1 text-rose-500 hover:text-rose-700"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Status, Payment & Totals */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 bg-slate-50/75 rounded-2xl border border-slate-200/80 space-y-3">
+                  <h4 className="font-bold text-slate-800 text-xs uppercase tracking-wider">
+                    Routing & Payment
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Payment Method</label>
+                      <select
+                        value={newPaymentMethod}
+                        onChange={(e) => setNewPaymentMethod(e.target.value)}
+                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-xl bg-white"
+                      >
+                        <option value="COD">Cash on Delivery (COD)</option>
+                        <option value="RAZORPAY">Razorpay</option>
+                        <option value="PHONEPE">PhonePe</option>
+                        <option value="BANK_TRANSFER">Bank Transfer</option>
+                        <option value="UPI">Manual UPI</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Payment Status</label>
+                      <select
+                        value={newPaymentStatus}
+                        onChange={(e) => setNewPaymentStatus(e.target.value)}
+                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-xl bg-white"
+                      >
+                        <option value="PENDING">Pending</option>
+                        <option value="PAID">Paid</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Order Status</label>
+                      <select
+                        value={newOrderStatus}
+                        onChange={(e) => setNewOrderStatus(e.target.value)}
+                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-xl bg-white"
+                      >
+                        <option value="CONFIRMED">Confirmed</option>
+                        <option value="PROCESSING">Processing</option>
+                        <option value="PACKED">Packed</option>
+                        <option value="SHIPPED">Shipped</option>
+                        <option value="DELIVERED">Delivered</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Courier Carrier</label>
+                      <select
+                        value={newCourier}
+                        onChange={(e) => setNewCourier(e.target.value)}
+                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-xl bg-white"
+                      >
+                        <option value="DELHIVERY">Delhivery Express</option>
+                        <option value="SHIPROCKET">Shiprocket Priority</option>
+                        <option value="BLUEDART">Blue Dart Apex</option>
+                        <option value="DTDC">DTDC Plus</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-slate-50/75 rounded-2xl border border-slate-200/80 space-y-2">
+                  <h4 className="font-bold text-slate-800 text-xs uppercase tracking-wider">
+                    Financial Summary
+                  </h4>
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex justify-between text-slate-600">
+                      <span>Subtotal:</span>
+                      <span className="font-bold">
+                        ₹{newItems.reduce((acc, it) => acc + it.price * it.quantity, 0).toLocaleString("en-IN")}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600">
+                      <span>Discount (₹):</span>
+                      <input
+                        type="number"
+                        min={0}
+                        value={newDiscount}
+                        onChange={(e) => setNewDiscount(Number(e.target.value) || 0)}
+                        className="w-24 px-2 py-1 border border-slate-200 rounded-lg text-right bg-white"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600">
+                      <span>Shipping Fee (₹):</span>
+                      <input
+                        type="number"
+                        min={0}
+                        value={newShippingFee}
+                        onChange={(e) => setNewShippingFee(Number(e.target.value) || 0)}
+                        className="w-24 px-2 py-1 border border-slate-200 rounded-lg text-right bg-white"
+                      />
+                    </div>
+
+                    <div className="pt-2 border-t flex justify-between font-extrabold text-[#0A192F] text-sm">
+                      <span>Final Order Total:</span>
+                      <span>
+                        ₹{Math.max(
+                          0,
+                          newItems.reduce((acc, it) => acc + it.price * it.quantity, 0) -
+                            Number(newDiscount) +
+                            Number(newShippingFee)
+                        ).toLocaleString("en-IN")}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Buttons */}
+              <div className="flex justify-end gap-3 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingOrder}
+                  className="px-6 py-2 bg-[#0A192F] hover:bg-[#1E293B] text-white font-bold rounded-xl transition-all shadow-md flex items-center gap-2"
+                >
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  {isSubmittingOrder ? "Creating Order..." : "Create Order"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT ORDER MODAL */}
+      {showEditModal && selectedOrder && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-slate-200 max-w-3xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto font-sans animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                  <Edit className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-[#0A192F]">
+                    Edit Order {selectedOrder.orderNumber}
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Update customer details, shipping address, fulfillment routing, or adjust items.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateOrder} className="space-y-6 text-xs">
+              {/* Customer Information */}
+              <div className="p-4 bg-slate-50/75 rounded-2xl border border-slate-200/80 space-y-3">
+                <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-2">
+                  <User className="w-3.5 h-3.5 text-[#2563EB]" />
+                  Customer Details
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Full Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={editCustomerName}
+                      onChange={(e) => setEditCustomerName(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Phone Number</label>
+                    <input
+                      type="text"
+                      required
+                      value={editCustomerPhone}
+                      onChange={(e) => setEditCustomerPhone(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Email Address</label>
+                    <input
+                      type="email"
+                      value={editCustomerEmail}
+                      onChange={(e) => setEditCustomerEmail(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Delivery Address */}
+              <div className="p-4 bg-slate-50/75 rounded-2xl border border-slate-200/80 space-y-3">
+                <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-2">
+                  <MapPin className="w-3.5 h-3.5 text-[#2563EB]" />
+                  Shipping Destination
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                  <div className="sm:col-span-2">
+                    <label className="block font-bold text-slate-700 mb-1">Address Line</label>
+                    <input
+                      type="text"
+                      value={editAddressLine}
+                      onChange={(e) => setEditAddressLine(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">City</label>
+                    <input
+                      type="text"
+                      value={editCity}
+                      onChange={(e) => setEditCity(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Pincode</label>
+                    <input
+                      type="text"
+                      value={editPincode}
+                      onChange={(e) => setEditPincode(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Status and Courier Routing */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 bg-slate-50/75 rounded-2xl border border-slate-200/80 space-y-3">
+                  <h4 className="font-bold text-slate-800 text-xs uppercase tracking-wider">
+                    Order Status & Payment
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Order Status</label>
+                      <select
+                        value={editStatus}
+                        onChange={(e) => setEditStatus(e.target.value)}
+                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-xl bg-white font-semibold"
+                      >
+                        {statuses.filter((s) => s.key !== "ALL").map((s) => (
+                          <option key={s.key} value={s.key}>{s.label}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Payment Status</label>
+                      <select
+                        value={editPaymentStatus}
+                        onChange={(e) => setEditPaymentStatus(e.target.value)}
+                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-xl bg-white font-semibold"
+                      >
+                        <option value="PENDING">Pending</option>
+                        <option value="PAID">Paid</option>
+                        <option value="FAILED">Failed</option>
+                        <option value="REFUNDED">Refunded</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Courier Carrier</label>
+                      <select
+                        value={editCourier}
+                        onChange={(e) => setEditCourier(e.target.value)}
+                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-xl bg-white"
+                      >
+                        <option value="DELHIVERY">Delhivery Express</option>
+                        <option value="SHIPROCKET">Shiprocket Priority</option>
+                        <option value="BLUEDART">Blue Dart Apex</option>
+                        <option value="DTDC">DTDC Plus</option>
+                        <option value="FLAT_RATE">Store Fleet</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Tracking AWB</label>
+                      <input
+                        type="text"
+                        value={editTracking}
+                        onChange={(e) => setEditTracking(e.target.value)}
+                        placeholder="AWB Number"
+                        className="w-full px-2.5 py-1.5 border border-slate-200 rounded-xl bg-white font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-slate-50/75 rounded-2xl border border-slate-200/80 space-y-3">
+                  <h4 className="font-bold text-slate-800 text-xs uppercase tracking-wider">
+                    Financial Adjustment
+                  </h4>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between text-slate-600">
+                      <span>Line Items Subtotal:</span>
+                      <span className="font-bold">
+                        ₹{editItems.reduce((acc, it) => acc + it.price * it.quantity, 0).toLocaleString("en-IN")}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600">
+                      <span>Discount (₹):</span>
+                      <input
+                        type="number"
+                        min={0}
+                        value={editDiscount}
+                        onChange={(e) => setEditDiscount(Number(e.target.value) || 0)}
+                        className="w-24 px-2 py-1 border border-slate-200 rounded-lg text-right bg-white"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600">
+                      <span>Shipping Fee (₹):</span>
+                      <input
+                        type="number"
+                        min={0}
+                        value={editShippingFee}
+                        onChange={(e) => setEditShippingFee(Number(e.target.value) || 0)}
+                        className="w-24 px-2 py-1 border border-slate-200 rounded-lg text-right bg-white"
+                      />
+                    </div>
+
+                    <div className="pt-2 border-t flex justify-between font-extrabold text-[#0A192F] text-sm">
+                      <span>Total Adjusted:</span>
+                      <span>
+                        ₹{Math.max(
+                          0,
+                          editItems.reduce((acc, it) => acc + it.price * it.quantity, 0) -
+                            Number(editDiscount) +
+                            Number(editShippingFee)
+                        ).toLocaleString("en-IN")}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Buttons */}
+              <div className="flex justify-end gap-3 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdating}
+                  className="px-6 py-2 bg-[#0A192F] hover:bg-[#1E293B] text-white font-bold rounded-xl transition-all shadow-md flex items-center gap-2"
+                >
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  {isUpdating ? "Saving Changes..." : "Save Order"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* QUICK ORDER DETAILS DRAWER */}
+      {selectedOrder && !showEditModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl border border-slate-200 max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto font-sans">
             <div className="flex items-center justify-between border-b pb-4">
               <div>
@@ -483,7 +1426,7 @@ export default function OrdersAdminPage() {
                     Order {selectedOrder.orderNumber}
                   </h3>
                   <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                    className={`px-2 py-0.5 rounded-sm text-[10px] font-bold ${
                       selectedOrder.orderStatus === "DELIVERED"
                         ? "bg-emerald-100 text-emerald-800"
                         : "bg-blue-100 text-blue-800"
@@ -496,12 +1439,21 @@ export default function OrdersAdminPage() {
                   Received on {new Date(selectedOrder.createdAt).toLocaleString()}
                 </span>
               </div>
-              <button
-                onClick={() => setSelectedOrder(null)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm transition-colors"
-              >
-                ✕
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleOpenEditModal(selectedOrder)}
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#0A192F] hover:text-white text-slate-700 font-bold text-xs transition-all flex items-center gap-1.5"
+                >
+                  <Edit className="w-3.5 h-3.5" />
+                  Edit Order
+                </button>
+                <button
+                  onClick={() => setSelectedOrder(null)}
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
             {/* Quick Action Buttons inside Drawer */}
@@ -580,10 +1532,10 @@ export default function OrdersAdminPage() {
               </div>
             </div>
 
-            {/* Status Update Form */}
+            {/* Quick Status Update Form */}
             <form onSubmit={handleUpdateOrder} className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4 text-xs">
               <h4 className="font-bold text-slate-900 text-sm">Fulfillment & Courier Routing</h4>
-              
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">Order Status</label>

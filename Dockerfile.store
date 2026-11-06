@@ -1,0 +1,24 @@
+# Multi-stage production build for AVRO Customer Store
+FROM node:20-alpine AS base
+
+WORKDIR /app
+RUN apk add --no-cache libc6-compat openssl
+
+COPY package.json package-lock.json ./
+COPY packages/license-core/package.json ./packages/license-core/
+COPY apps/store/package.json ./apps/store/
+
+RUN npm ci
+
+COPY packages/license-core ./packages/license-core
+COPY apps/store ./apps/store
+
+RUN npm --workspace=packages/license-core run build
+RUN cd apps/store && npx prisma generate
+RUN cd apps/store && npm run build
+
+EXPOSE 3001
+ENV PORT 3001
+ENV NODE_ENV production
+
+CMD ["npm", "--workspace=apps/store", "run", "start"]

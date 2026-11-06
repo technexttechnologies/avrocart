@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # Independent Customer PostgreSQL Database
+  avro-db:
+    image: postgres:15-alpine
+    container_name: avro_customer_db
+    restart: always
+    environment:
+      POSTGRES_USER: avro_user
+      POSTGRES_PASSWORD: avro_secure_password_2026
+      POSTGRES_DB: avro_store_db
+    volumes:
+      - avro_pgdata:/var/lib/postgresql/data
+    networks:
+      - avro-network
+
+  # Independent Customer AVRO Store Application
+  avro-store:
+    build:
+      context: .
+      dockerfile: Dockerfile.store
+    container_name: avro_customer_store
+    restart: always
+    environment:
+      DATABASE_URL: "postgresql://avro_user:avro_secure_password_2026@avro-db:5432/avro_store_db?schema=public"
+      JWT_SECRET: "replace_with_customer_jwt_secret"
+      CENTRAL_API_URL: "https://licensing.technext.co/api/v1"
+      STORE_DOMAIN: "your-domain.com"
+      NODE_ENV: "production"
+    ports:
+      - "3001:3001"
+    depends_on:
+      - avro-db
+    networks:
+      - avro-network
+
+volumes:
+  avro_pgdata:
+
+networks:
+  avro-network:
+    driver: bridge

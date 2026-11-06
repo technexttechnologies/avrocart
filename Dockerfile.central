@@ -1,0 +1,24 @@
+# Multi-stage production build for TECHNEXT AVRO Central Management
+FROM node:20-alpine AS base
+
+WORKDIR /app
+RUN apk add --no-cache libc6-compat openssl
+
+COPY package.json package-lock.json ./
+COPY packages/license-core/package.json ./packages/license-core/
+COPY apps/central/package.json ./apps/central/
+
+RUN npm ci
+
+COPY packages/license-core ./packages/license-core
+COPY apps/central ./apps/central
+
+RUN npm --workspace=packages/license-core run build
+RUN cd apps/central && npx prisma generate
+RUN cd apps/central && npm run build
+
+EXPOSE 3000
+ENV PORT 3000
+ENV NODE_ENV production
+
+CMD ["npm", "--workspace=apps/central", "run", "start"]

@@ -1,0 +1,27 @@
+{
+  "name": "avro-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AVRO by TECHNEXT — Self-Hosted E-Commerce Platform & Central Control Engine",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm --workspace=apps/central run dev",
+    "build": "npm --workspace=packages/license-core run build && npm --workspace=apps/central run build",
+    "start": "npm --workspace=apps/central run start",
+    "dev:central": "npm --workspace=apps/central run dev",
+    "dev:store": "npm --workspace=apps/store run dev",
+    "build:central": "npm --workspace=packages/license-core run build && npm --workspace=apps/central run build",
+    "build:store": "npm --workspace=packages/license-core run build && npm --workspace=apps/store run build",
+    "db:central:generate": "npm --workspace=apps/central run db:generate",
+    "db:central:push": "npm --workspace=apps/central run db:push",
+    "db:store:generate": "npm --workspace=apps/store run db:generate",
+    "db:store:push": "npm --workspace=apps/store run db:push",
+    "db:seed": "npm --workspace=apps/central run db:seed && npm --workspace=apps/store run db:seed"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

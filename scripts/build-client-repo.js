@@ -62,6 +62,8 @@ pkg.repository = {
 };
 pkg.scripts = {
   ...pkg.scripts,
+  dev: "next dev -H 0.0.0.0 -p 3001",
+  start: "next start -H 0.0.0.0 -p 3001",
   build: "node scripts/prepare-prisma.js && npx prisma generate && next build",
   "build:store": "node scripts/prepare-prisma.js && npx prisma generate && next build",
   "vercel-build": "node scripts/prepare-prisma.js && npx prisma generate && next build",

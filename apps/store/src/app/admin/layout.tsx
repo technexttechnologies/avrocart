@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -28,8 +28,17 @@ import {
   Search,
   Sparkles,
   Store,
+  LogOut,
+  Loader2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+
+interface AdminUser {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+}
 
 export default function StoreAdminLayout({
   children,
@@ -37,12 +46,54 @@ export default function StoreAdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
   const [licenseInfo, setLicenseInfo] = useState<any>(null);
   const [broadcasts, setBroadcasts] = useState<any[]>([]);
   const [dismissedIds, setDismissedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const isLoginPage = pathname === "/admin/login";
+
+  // Auth Guard
   useEffect(() => {
+    if (isLoginPage) {
+      setCheckingAuth(false);
+      return;
+    }
+
+    let isMounted = true;
+    fetch("/api/admin/auth/me")
+      .then((res) => {
+        if (!res.ok) throw new Error("Unauthorized");
+        return res.json();
+      })
+      .then((data) => {
+        if (!isMounted) return;
+        if (data.authenticated && data.user) {
+          setAdminUser(data.user);
+          setCheckingAuth(false);
+        } else {
+          router.replace("/admin/login");
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          router.replace("/admin/login");
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [pathname, isLoginPage, router]);
+
+  // License & Broadcasts loader
+  useEffect(() => {
+    if (isLoginPage) return;
+
     fetch("/api/admin/dashboard")
       .then((res) => res.json())
       .then((data) => {
@@ -51,7 +102,46 @@ export default function StoreAdminLayout({
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [pathname]);
+  }, [pathname, isLoginPage]);
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/admin/auth/logout", { method: "POST" });
+    } catch (e) {
+      // ignore
+    } finally {
+      router.push("/admin/login");
+    }
+  };
+
+  // If on login page, render clean login view without navigation frame
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+
+  // Security Verification Guard Screen
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-[#070F1E] flex flex-col items-center justify-center font-sans text-slate-200">
+        <div className="flex flex-col items-center gap-4 max-w-sm text-center px-4">
+          <div className="relative">
+            <div className="w-16 h-16 rounded-2xl bg-blue-600/10 border border-blue-500/30 flex items-center justify-center">
+              <ShieldCheck className="w-8 h-8 text-blue-400 animate-pulse" />
+            </div>
+            <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            </span>
+          </div>
+          <div>
+            <h2 className="text-sm font-bold tracking-wide uppercase text-white">Authenticating Merchant Session</h2>
+            <p className="text-xs text-slate-400 mt-1">Verifying encrypted 2FA credentials & store permissions...</p>
+          </div>
+          <Loader2 className="w-5 h-5 text-blue-400 animate-spin mt-2" />
+        </div>
+      </div>
+    );
+  }
 
   const navCommerce = [
     { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -249,7 +339,7 @@ export default function StoreAdminLayout({
         </div>
 
         {/* Bottom Utility Bar */}
-        <div className="p-3 border-t border-slate-200/80 space-y-2 text-xs">
+        <div className="p-3 border-t border-slate-200/80 space-y-1.5 text-xs">
           <Link
             href="/"
             target="_blank"
@@ -261,6 +351,18 @@ export default function StoreAdminLayout({
             </div>
             <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
           </Link>
+
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 font-semibold transition-colors border border-rose-200/60 text-xs"
+          >
+            <div className="flex items-center gap-2">
+              <LogOut className="w-3.5 h-3.5 text-rose-600" />
+              <span>{loggingOut ? "Signing out..." : "Sign Out"}</span>
+            </div>
+            <span className="text-[10px] text-rose-500">2FA Active</span>
+          </button>
         </div>
       </aside>
 
@@ -304,11 +406,15 @@ export default function StoreAdminLayout({
             {/* Admin Profile Chip */}
             <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
               <div className="w-8 h-8 rounded-full bg-[#0A192F] text-white flex items-center justify-center font-bold text-xs shadow-2xs">
-                SA
+                {adminUser?.name ? adminUser.name.charAt(0).toUpperCase() : "S"}
               </div>
               <div className="hidden lg:block text-left">
-                <span className="font-bold text-slate-900 block text-[11px]">Administrator</span>
-                <span className="text-[10px] text-slate-400 block -mt-0.5">Store Owner</span>
+                <span className="font-bold text-slate-900 block text-[11px] truncate max-w-[120px]">
+                  {adminUser?.name || "Administrator"}
+                </span>
+                <span className="text-[10px] text-slate-400 block -mt-0.5 truncate max-w-[120px]">
+                  {adminUser?.role || "OWNER"} • 2FA
+                </span>
               </div>
             </div>
           </div>

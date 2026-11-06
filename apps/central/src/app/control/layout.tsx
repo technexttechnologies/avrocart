@@ -1,7 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -19,7 +20,16 @@ import {
   FileText,
   Bell,
   Lock,
+  Loader2,
+  ShieldAlert,
 } from "lucide-react";
+
+interface AdminUser {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+}
 
 export default function ControlLayout({
   children,
@@ -27,6 +37,83 @@ export default function ControlLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const isLoginPage = pathname === "/control/login";
+
+  useEffect(() => {
+    if (isLoginPage) {
+      setCheckingAuth(false);
+      return;
+    }
+
+    let isMounted = true;
+    fetch("/api/v1/auth/admin/me")
+      .then((res) => {
+        if (!res.ok) throw new Error("Unauthorized");
+        return res.json();
+      })
+      .then((data) => {
+        if (!isMounted) return;
+        if (data.authenticated && data.user) {
+          setAdminUser(data.user);
+          setCheckingAuth(false);
+        } else {
+          router.replace("/control/login");
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          router.replace("/control/login");
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [pathname, isLoginPage, router]);
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/v1/auth/admin/logout", { method: "POST" });
+    } catch (e) {
+      // ignore
+    } finally {
+      router.push("/control/login");
+    }
+  };
+
+  // If on login page, render clean login view without navigation frame
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+
+  // Security Verification Guard
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-[#070F1E] flex flex-col items-center justify-center font-sans text-slate-200">
+        <div className="flex flex-col items-center gap-4 max-w-sm text-center px-4">
+          <div className="relative">
+            <div className="w-16 h-16 rounded-2xl bg-blue-600/10 border border-blue-500/30 flex items-center justify-center">
+              <ShieldCheck className="w-8 h-8 text-blue-400 animate-pulse" />
+            </div>
+            <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            </span>
+          </div>
+          <div>
+            <h2 className="text-sm font-bold tracking-wide uppercase text-white">Verifying Central Authority</h2>
+            <p className="text-xs text-slate-400 mt-1">Authenticating cryptographic JWT session & permissions...</p>
+          </div>
+          <Loader2 className="w-5 h-5 text-blue-400 animate-spin mt-2" />
+        </div>
+      </div>
+    );
+  }
 
   const menuItems = [
     { label: "Overview Dashboard", href: "/control", icon: LayoutDashboard },
@@ -65,15 +152,20 @@ export default function ControlLayout({
           </div>
 
           {/* Admin badge */}
-          <div className="px-6 py-4 border-b border-slate-800/60 bg-slate-900/40">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs border border-emerald-500/30">
-                TN
+          <div className="px-5 py-3.5 border-b border-slate-800/60 bg-slate-900/60">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs border border-emerald-500/30 flex-shrink-0">
+                  {adminUser?.name ? adminUser.name.charAt(0).toUpperCase() : "A"}
+                </div>
+                <div className="text-xs min-w-0 truncate">
+                  <span className="font-bold text-white block truncate">{adminUser?.name || "Master Admin"}</span>
+                  <span className="text-[10px] text-slate-400 truncate block">{adminUser?.email || "admin@technext.co"}</span>
+                </div>
               </div>
-              <div className="text-xs">
-                <span className="font-bold text-white block">Technext Master Admin</span>
-                <span className="text-[10px] text-slate-400">admin@technext.co</span>
-              </div>
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 font-bold uppercase">
+                {adminUser?.role || "SUPER"}
+              </span>
             </div>
           </div>
 
@@ -101,7 +193,7 @@ export default function ControlLayout({
         </div>
 
         {/* Bottom utility links */}
-        <div className="p-4 border-t border-slate-800 space-y-2 text-xs">
+        <div className="p-3 border-t border-slate-800 space-y-1.5 text-xs">
           <Link
             href="/"
             className="flex items-center justify-between px-3 py-2 rounded-lg bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
@@ -111,11 +203,22 @@ export default function ControlLayout({
           </Link>
           <Link
             href="/docs"
-            className="flex items-center justify-between px-3 py-2 rounded-lg bg-blue-950/60 text-blue-400 hover:text-blue-300 hover:bg-blue-900/60 transition-colors"
+            className="flex items-center justify-between px-3 py-2 rounded-lg bg-blue-950/40 text-blue-400 hover:text-blue-300 hover:bg-blue-900/60 transition-colors"
           >
-            <span>System Documentation</span>
+            <span>Documentation</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </Link>
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-rose-950/30 text-rose-400 hover:bg-rose-900/50 hover:text-rose-300 transition-colors border border-rose-900/30 font-semibold"
+          >
+            <span className="flex items-center gap-2">
+              <LogOut className="w-3.5 h-3.5" />
+              <span>{loggingOut ? "Signing Out..." : "Sign Out"}</span>
+            </span>
+            <span className="text-[10px] text-rose-500/80">End 2FA Session</span>
+          </button>
         </div>
       </aside>
 
@@ -130,10 +233,14 @@ export default function ControlLayout({
             </span>
           </div>
 
-          <div className="flex items-center gap-4 text-xs">
+          <div className="flex items-center gap-3 text-xs">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Central Licensing Authority Live
+            </span>
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-semibold">
+              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+              2FA Authenticated
             </span>
           </div>
         </header>

@@ -8,11 +8,16 @@ const targetRepoDir = path.resolve(rootDir, "dist/avrostore");
 
 console.log("Preparing AVROSTORE standalone repository...");
 
-// Clean existing target dir
+// Clean existing target dir except .git
 if (fs.existsSync(targetRepoDir)) {
-  fs.rmSync(targetRepoDir, { recursive: true, force: true });
+  const entries = fs.readdirSync(targetRepoDir);
+  for (const entry of entries) {
+    if (entry === ".git") continue;
+    fs.rmSync(path.join(targetRepoDir, entry), { recursive: true, force: true });
+  }
+} else {
+  fs.mkdirSync(targetRepoDir, { recursive: true });
 }
-fs.mkdirSync(targetRepoDir, { recursive: true });
 
 // Helper to recursively copy directories
 function copyRecursive(src, dest, ignore = []) {
@@ -54,6 +59,13 @@ pkg.description = "AVRO — Self-Hosted Customer Storefront & Merchant Backoffic
 pkg.repository = {
   type: "git",
   url: "https://github.com/technexttechnologies/avrostore.git",
+};
+pkg.scripts = {
+  ...pkg.scripts,
+  build: "node scripts/prepare-prisma.js && prisma generate && next build",
+  "build:store": "node scripts/prepare-prisma.js && prisma generate && next build",
+  "vercel-build": "node scripts/prepare-prisma.js && prisma generate && next build",
+  postinstall: "prisma generate",
 };
 fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2), "utf8");
 
@@ -290,6 +302,9 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Native binary engines
+*.node
 
 # Operating System Files
 .DS_Store

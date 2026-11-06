@@ -2,6 +2,11 @@ const path = require("path");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  compress: true,
+  poweredByHeader: false,
+  experimental: {
+    optimizePackageImports: ["lucide-react", "recharts", "framer-motion"],
+  },
   transpilePackages: ["@avro/license-core"],
   eslint: {
     ignoreDuringBuilds: true,

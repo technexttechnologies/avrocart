@@ -51,6 +51,11 @@ export default function ControlLayout({
       return;
     }
 
+    if (adminUser) {
+      setCheckingAuth(false);
+      return;
+    }
+
     let isMounted = true;
     fetch("/api/v1/auth/admin/me")
       .then((res) => {
@@ -75,7 +80,7 @@ export default function ControlLayout({
     return () => {
       isMounted = false;
     };
-  }, [pathname, isLoginPage, router]);
+  }, [isLoginPage, router, adminUser]);
 
   const handleLogout = async () => {
     setLoggingOut(true);

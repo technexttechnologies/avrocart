@@ -23,7 +23,7 @@ export async function GET() {
           heroBadge: "EXCLUSIVE COLLECTION 2026",
           heroCtaText: "Shop Catalog",
           heroCtaLink: "/shop",
-          companyAddress: "Plot 42, TechNext Cyber Park, Sector 62",
+          companyAddress: "Plot 42, Commercial Avenue, Sector 62",
           companyCity: "Noida",
           companyState: "Uttar Pradesh",
           companyPostalCode: "201309",
@@ -33,7 +33,7 @@ export async function GET() {
           taxId: "07AAACT9021M1Z4",
           announcementBarText: "⚡ Free Priority Delivery on all orders above ₹999 with 7-day easy returns",
           showAnnouncementBar: true,
-          footerText: "© 2026 AVRO Store. Powered by AVRO by TECHNEXT.",
+          footerText: "© 2026 AVRO Store. Powered by AVRO.",
         },
       });
     }
@@ -120,7 +120,7 @@ export async function PUT(req: NextRequest) {
         heroBadge: heroBadge || "EXCLUSIVE COLLECTION",
         heroCtaText: heroCtaText || "Shop Catalog",
         heroCtaLink: heroCtaLink || "/shop",
-        footerText: footerText || "© 2026 AVRO Store. Powered by AVRO by TECHNEXT.",
+        footerText: footerText || "© 2026 AVRO Store. Powered by AVRO.",
         announcementBarText: announcementBarText || "⚡ Free Shipping on orders over ₹999",
         showAnnouncementBar: Boolean(showAnnouncementBar),
         primaryColor: primaryColor || "#0A192F",

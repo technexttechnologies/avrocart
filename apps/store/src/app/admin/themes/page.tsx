@@ -1168,8 +1168,8 @@ export default function ThemesAdminPage() {
 
                 {/* 6. Preview Footer */}
                 <div className="p-4 bg-slate-900 text-slate-400 text-[10px] text-center border-t border-slate-800 space-y-1 mt-auto">
-                  <p>{themeConfig.footerText || "© 2026 AVRO Store. Powered by AVRO by TECHNEXT."}</p>
-                  <p className="text-[9px] text-slate-500">Autonomous Single Merchant Engine</p>
+                  <p>{themeConfig.footerText || "© 2026 AVRO Store. Powered by AVRO."}</p>
+                  <p className="text-[9px] text-slate-500">Powered by AVRO</p>
                 </div>
               </div>
             </div>

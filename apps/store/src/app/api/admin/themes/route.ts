@@ -135,7 +135,7 @@ export async function PUT(req: NextRequest) {
         announcementBarText: announcementBarText || "⚡ Free Shipping on orders over ₹999",
         showAnnouncementBar: Boolean(showAnnouncementBar),
         socialLinksJson: typeof socialLinksJson === "string" ? socialLinksJson : JSON.stringify(socialLinksJson || {}),
-        footerText: footerText || "© 2026 AVRO Store. Powered by AVRO by TECHNEXT.",
+        footerText: footerText || "© 2026 AVRO Store. Powered by AVRO.",
       },
     });
 

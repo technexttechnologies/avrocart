@@ -17,9 +17,16 @@ export function ThemePreviewDock({ initialThemeCode }: { initialThemeCode?: stri
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentParam = searchParams.get("theme") || searchParams.get("previewTheme");
+  const isPreviewMode = searchParams.get("preview") === "true" || !!currentParam;
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
   const [appliedNotice, setAppliedNotice] = useState<string | null>(null);
+
+  // If not explicitly previewing with ?theme= or ?preview=true, do not display dock on storefront
+  if (!isPreviewMode) {
+    return null;
+  }
 
   const activeThemeCode = currentParam || initialThemeCode || "AVRO_SIGNATURE";
   const activeTheme =

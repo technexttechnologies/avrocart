@@ -33,7 +33,7 @@ export default async function StoreLayout({
           <div className="bg-white px-4 py-2 rounded-2xl inline-block shadow-md mx-auto">
             <img
               src="/avro-logo.png"
-              alt="AVROCART by TECHNEXT"
+              alt="AVRO"
               className="h-10 w-auto object-contain"
             />
           </div>
@@ -50,7 +50,7 @@ export default async function StoreLayout({
               Storefront Temporarily Offline
             </h1>
             <p className="text-sm text-slate-400 leading-relaxed max-w-lg mx-auto">
-              This independent self-hosted store has been paused because its commercial AVRO software license has expired or is awaiting renewal with TECHNEXT Technologies.
+              This independent store has been paused because its commercial software license has expired or is awaiting renewal.
             </p>
           </div>
 
@@ -103,7 +103,7 @@ export default async function StoreLayout({
 
         {/* Footer */}
         <footer className="border-t border-slate-900 py-6 text-center text-xs text-slate-500">
-          Powered by <strong className="text-slate-400">AVRO</strong> by TECHNEXT TECHNOLOGIES. Self-Hosted E-Commerce Core.
+          Powered by <strong className="text-slate-400">AVRO</strong>
         </footer>
       </div>
     );

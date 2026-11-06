@@ -23,7 +23,7 @@ export default async function AboutPage() {
           Unlike mass-market fast consumer products, our catalog is curated in focused production runs. Every piece is thoroughly inspected, backed by warranty, and dispatched directly from our dedicated warehouse to your doorstep.
         </p>
         <p>
-          Powered by <strong>AVRO by TECHNEXT</strong>, our store operates on independent infrastructure, ensuring your personal order data, payment information, and transaction histories remain 100% private and protected.
+          Powered by <strong>AVRO</strong>, our store operates on independent high-security infrastructure, ensuring your personal order data, payment information, and transaction histories remain 100% private and protected.
         </p>
       </div>
     </div>

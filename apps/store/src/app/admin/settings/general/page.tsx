@@ -38,7 +38,7 @@ export default function GeneralSettingsAdminPage() {
     brandName: "AVRO Store",
     logoUrl: "",
     faviconUrl: "",
-    companyAddress: "Plot 42, TechNext Cyber Park, Sector 62",
+    companyAddress: "Plot 42, Commercial Avenue, Sector 62",
     companyCity: "Noida",
     companyState: "Uttar Pradesh",
     companyPostalCode: "201309",
@@ -52,7 +52,7 @@ export default function GeneralSettingsAdminPage() {
     heroBadge: "EXCLUSIVE COLLECTION 2026",
     heroCtaText: "Shop Catalog",
     heroCtaLink: "/shop",
-    footerText: "© 2026 AVRO Store. Powered by AVRO by TECHNEXT.",
+    footerText: "© 2026 AVRO Store. Powered by AVRO.",
   });
 
   const heroPresets = [
@@ -87,7 +87,7 @@ export default function GeneralSettingsAdminPage() {
           heroBadge: data.settings.heroBadge || "EXCLUSIVE COLLECTION 2026",
           heroCtaText: data.settings.heroCtaText || "Shop Catalog",
           heroCtaLink: data.settings.heroCtaLink || "/shop",
-          footerText: data.settings.footerText || "© 2026 AVRO Store. Powered by AVRO by TECHNEXT.",
+          footerText: data.settings.footerText || "© 2026 AVRO Store. Powered by AVRO.",
         });
       }
     } catch (e) {

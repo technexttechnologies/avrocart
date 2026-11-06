@@ -17,8 +17,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AVRO Storefront — Self-Hosted E-Commerce",
-  description: "Powered by AVRO by TECHNEXT TECHNOLOGIES. Independent self-hosted e-commerce software platform.",
+  title: "AVRO Storefront — Modern E-Commerce",
+  description: "Powered by AVRO. High-performance independent e-commerce platform.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

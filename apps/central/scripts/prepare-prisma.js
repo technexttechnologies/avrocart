@@ -9,37 +9,56 @@ if (!fs.existsSync(schemaPath)) {
 }
 
 let schema = fs.readFileSync(schemaPath, "utf8");
-const dbUrl = process.env.DATABASE_URL || "";
-const directUrl = process.env.DIRECT_URL || "";
 
-// Detect database provider based on connection string
+// Check all common Vercel / Supabase injected environment variables
+const dbUrl =
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_PRISMA_URL ||
+  process.env.POSTGRES_URL ||
+  process.env.SUPABASE_POSTGRES_PRISMA_URL ||
+  "";
+
+const directUrl =
+  process.env.DIRECT_URL ||
+  process.env.POSTGRES_URL_NON_POOLING ||
+  "";
+
+// If DATABASE_URL is not set but Vercel injected POSTGRES_PRISMA_URL, determine which env var name to bind
+let urlEnvVar = "DATABASE_URL";
+if (!process.env.DATABASE_URL) {
+  if (process.env.POSTGRES_PRISMA_URL) urlEnvVar = "POSTGRES_PRISMA_URL";
+  else if (process.env.POSTGRES_URL) urlEnvVar = "POSTGRES_URL";
+}
+
+let directEnvVar = "DIRECT_URL";
+if (!process.env.DIRECT_URL && process.env.POSTGRES_URL_NON_POOLING) {
+  directEnvVar = "POSTGRES_URL_NON_POOLING";
+}
+
+// Detect database provider based on connection string or Vercel environment
 if (
   dbUrl.startsWith("postgres://") ||
   dbUrl.startsWith("postgresql://") ||
-  dbUrl.startsWith("prisma://")
+  dbUrl.startsWith("prisma://") ||
+  process.env.VERCEL
 ) {
-  console.log('[prepare-prisma] Detected PostgreSQL (Supabase/Neon). Ensuring provider = "postgresql" in schema.prisma');
+  console.log(`[prepare-prisma] Detected PostgreSQL (Supabase/Neon). Binding url = env("${urlEnvVar}")`);
   schema = schema.replace(/provider\s*=\s*"sqlite"/g, 'provider = "postgresql"');
-  if (directUrl && !schema.includes("directUrl")) {
+  
+  if (urlEnvVar !== "DATABASE_URL") {
+    schema = schema.replace(/env\("DATABASE_URL"\)/g, `env("${urlEnvVar}")`);
+  }
+
+  if ((directUrl || process.env[directEnvVar]) && !schema.includes("directUrl")) {
     schema = schema.replace(
-      /url\s*=\s*env\("DATABASE_URL"\)/g,
-      'url       = env("DATABASE_URL")\n  directUrl = env("DIRECT_URL")'
+      new RegExp(`url\\s*=\\s*env\\("${urlEnvVar}"\\)`, "g"),
+      `url       = env("${urlEnvVar}")\n  directUrl = env("${directEnvVar}")`
     );
   }
 } else if (dbUrl.startsWith("file:") || (!dbUrl && !process.env.VERCEL)) {
   console.log('[prepare-prisma] Detected SQLite/local DATABASE_URL. Ensuring provider = "sqlite" in schema.prisma');
   schema = schema.replace(/provider\s*=\s*"postgresql"/g, 'provider = "sqlite"');
-  schema = schema.replace(/\s*directUrl\s*=\s*env\("DIRECT_URL"\)/g, "");
-} else if (process.env.VERCEL) {
-  // If running on Vercel without file: protocol, use postgresql
-  console.log('[prepare-prisma] Running in Vercel environment. Setting provider = "postgresql" in schema.prisma');
-  schema = schema.replace(/provider\s*=\s*"sqlite"/g, 'provider = "postgresql"');
-  if (directUrl && !schema.includes("directUrl")) {
-    schema = schema.replace(
-      /url\s*=\s*env\("DATABASE_URL"\)/g,
-      'url       = env("DATABASE_URL")\n  directUrl = env("DIRECT_URL")'
-    );
-  }
+  schema = schema.replace(/\s*directUrl\s*=\s*env\("[^"]+"\)/g, "");
 }
 
 fs.writeFileSync(schemaPath, schema);

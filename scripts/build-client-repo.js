@@ -62,10 +62,10 @@ pkg.repository = {
 };
 pkg.scripts = {
   ...pkg.scripts,
-  build: "node scripts/prepare-prisma.js && prisma generate && next build",
-  "build:store": "node scripts/prepare-prisma.js && prisma generate && next build",
-  "vercel-build": "node scripts/prepare-prisma.js && prisma generate && next build",
-  postinstall: "prisma generate",
+  build: "node scripts/prepare-prisma.js && npx prisma generate && next build",
+  "build:store": "node scripts/prepare-prisma.js && npx prisma generate && next build",
+  "vercel-build": "node scripts/prepare-prisma.js && npx prisma generate && next build",
+  postinstall: "npx prisma generate",
 };
 fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2), "utf8");
 

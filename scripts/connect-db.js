@@ -7,46 +7,27 @@ const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
-const dbUrl = process.argv[2];
+const rawDbUrl = process.argv[2];
 const target = process.argv[3] || "central"; // central, store, or both
-const directUrl = process.argv[4] || "";
+const rawDirectUrl = process.argv[4] || "";
 
-if (!dbUrl) {
-  console.log(`
-=============================================================
-  AVRO SUPABASE / POSTGRESQL CONNECTION HELPER
-=============================================================
-
-Usage:
-  node scripts/connect-db.js "<DATABASE_URL>" [target] ["<DIRECT_URL>"]
-
-Supabase Connection Strings:
-  1. Go to your Supabase Project Dashboard
-  2. Navigate to: Project Settings -> Database -> Connection string
-  3. Select "URI" tab:
-     - Transaction Pooler (Recommended for Vercel/Serverless, Port 6543):
-       postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true
-     - Direct / Session Connection (Port 5432):
-       postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres
-
-Command Examples:
-  A) Connect Central Panel with Supabase Direct Connection:
-     node scripts/connect-db.js "postgresql://postgres.xxx:mypassword@aws-0-ap-south-1.pooler.supabase.com:5432/postgres" central
-
-  B) Connect with Pooler and Direct URL:
-     node scripts/connect-db.js "postgresql://postgres.xxx:mypassword@aws-0-ap-south-1.pooler.supabase.com:6543/postgres?pgbouncer=true" central "postgresql://postgres.xxx:mypassword@aws-0-ap-south-1.pooler.supabase.com:5432/postgres"
-=============================================================
-`);
+if (!rawDbUrl) {
+  console.log("Usage: node scripts/connect-db.js <DATABASE_URL> [central|store|both] [DIRECT_URL]");
   process.exit(1);
 }
 
-console.log("-------------------------------------------------------------");
-console.log("Configuring Supabase Connection...");
-console.log("Target:", target);
-console.log("Database Host:", dbUrl.split("@")[1]?.split("/")[0] || "custom");
-console.log("-------------------------------------------------------------");
+function withSchema(url, schemaName) {
+  if (!url || url.startsWith("file:")) return url;
+  if (url.includes("schema=")) return url;
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}schema=${schemaName}`;
+}
 
 function updateAppDb(appDir, isCentral) {
+  const schemaName = isCentral ? "central" : "store";
+  const appDbUrl = withSchema(rawDbUrl, schemaName);
+  const appDirectUrl = withSchema(rawDirectUrl, schemaName);
+
   const envPath = path.join(appDir, ".env");
   const schemaPath = path.join(appDir, "prisma/schema.prisma");
 
@@ -55,54 +36,59 @@ function updateAppDb(appDir, isCentral) {
   if (fs.existsSync(envPath)) {
     envContent = fs.readFileSync(envPath, "utf8");
     if (envContent.includes("DATABASE_URL=")) {
-      envContent = envContent.replace(/DATABASE_URL=.*/g, `DATABASE_URL="${dbUrl}"`);
+      envContent = envContent.replace(/DATABASE_URL=.*/g, `DATABASE_URL="${appDbUrl}"`);
     } else {
-      envContent += `\nDATABASE_URL="${dbUrl}"\n`;
+      envContent += `\nDATABASE_URL="${appDbUrl}"\n`;
     }
 
-    if (directUrl) {
+    if (appDirectUrl) {
       if (envContent.includes("DIRECT_URL=")) {
-        envContent = envContent.replace(/DIRECT_URL=.*/g, `DIRECT_URL="${directUrl}"`);
+        envContent = envContent.replace(/DIRECT_URL=.*/g, `DIRECT_URL="${appDirectUrl}"`);
       } else {
-        envContent += `DIRECT_URL="${directUrl}"\n`;
+        envContent += `DIRECT_URL="${appDirectUrl}"\n`;
       }
     }
   } else {
-    envContent = `DATABASE_URL="${dbUrl}"\n`;
-    if (directUrl) envContent += `DIRECT_URL="${directUrl}"\n`;
+    envContent = `DATABASE_URL="${appDbUrl}"\n`;
+    if (appDirectUrl) envContent += `DIRECT_URL="${appDirectUrl}"\n`;
     envContent += `NODE_ENV="development"\n`;
   }
   fs.writeFileSync(envPath, envContent, "utf8");
-  console.log(`[OK] Updated ${envPath}`);
+  console.log(`[OK] Updated ${envPath} (schema: ${schemaName})`);
 
   // 2. Adjust schema.prisma provider
   let schema = fs.readFileSync(schemaPath, "utf8");
-  if (dbUrl.startsWith("postgres://") || dbUrl.startsWith("postgresql://")) {
+  if (appDbUrl.startsWith("postgres://") || appDbUrl.startsWith("postgresql://")) {
     schema = schema.replace(/provider\s*=\s*"sqlite"/g, 'provider = "postgresql"');
-    if (directUrl && !schema.includes("directUrl")) {
+    if (appDirectUrl && !schema.includes("directUrl")) {
       schema = schema.replace(
         /url\s*=\s*env\("DATABASE_URL"\)/g,
         'url       = env("DATABASE_URL")\n  directUrl = env("DIRECT_URL")'
       );
     }
-  } else if (dbUrl.startsWith("file:")) {
+  } else if (appDbUrl.startsWith("file:")) {
     schema = schema.replace(/provider\s*=\s*"postgresql"/g, 'provider = "sqlite"');
-    schema = schema.replace(/\s*directUrl\s*=\s*env\("DIRECT_URL"\)/g, "");
+    schema = schema.replace(/\s*directUrl\s*=\s*env\("[^"]+"\)/g, "");
   }
   fs.writeFileSync(schemaPath, schema, "utf8");
   console.log(`[OK] Updated ${schemaPath}`);
 
   // 3. Generate and Push Schema
-  console.log(`[Connecting and syncing schema to Supabase for ${path.basename(appDir)}...]`);
+  console.log(`[Connecting and syncing schema to Supabase for ${path.basename(appDir)} (schema: ${schemaName})...]`);
   try {
-    execSync("npx prisma generate", { cwd: appDir, stdio: "inherit", env: { ...process.env, DATABASE_URL: directUrl || dbUrl, DIRECT_URL: directUrl } });
-    execSync("npx prisma db push --accept-data-loss", { cwd: appDir, stdio: "inherit", env: { ...process.env, DATABASE_URL: directUrl || dbUrl, DIRECT_URL: directUrl } });
-    console.log(`[OK] Tables created in Supabase successfully!`);
+    const runEnv = {
+      ...process.env,
+      DATABASE_URL: appDirectUrl || appDbUrl,
+      DIRECT_URL: appDirectUrl || appDbUrl,
+    };
+    execSync("npx prisma generate", { cwd: appDir, stdio: "inherit", env: runEnv });
+    execSync("npx prisma db push --accept-data-loss", { cwd: appDir, stdio: "inherit", env: runEnv });
+    console.log(`[OK] Tables created in Supabase (schema: ${schemaName}) successfully!`);
 
     // 4. Seed database
-    console.log(`[Seeding initial master data...]`);
-    execSync("node prisma/seed.js", { cwd: appDir, stdio: "inherit", env: { ...process.env, DATABASE_URL: directUrl || dbUrl, DIRECT_URL: directUrl } });
-    console.log(`[OK] Master data seeded into Supabase!`);
+    console.log(`[Seeding initial master data for ${path.basename(appDir)}...]`);
+    execSync("node prisma/seed.js", { cwd: appDir, stdio: "inherit", env: runEnv });
+    console.log(`[OK] Seed complete for ${path.basename(appDir)}!`);
   } catch (err) {
     console.error(`[ERROR] Supabase sync/seed failed:`, err.message);
   }
@@ -119,5 +105,5 @@ if (target === "store" || target === "both") {
 }
 
 console.log("-------------------------------------------------------------");
-console.log("Supabase connection and database setup finished!");
+console.log("Supabase multi-schema setup completed!");
 console.log("-------------------------------------------------------------");
